@@ -3,11 +3,41 @@ import { Children, createContext, useContext, useState } from "react";
 export const PetContext = createContext();
 export const PetProvider = ({children})=>{
     const [pet, setPet] = useState('')
-    
+    const [walkProgressCounter, setWalkProgressCounter] = useState(0)
+    const [walkLabel, setWalkLabel] = useState('')
+    const [dogInfo, setDogInfo] = useState({
+        name:"Bruno",
+        sex: "M",
+        bath: 1,
+        feed: {
+          morning: "9:00 AM",
+          afternoon: "1:00 PM",
+          snack: "5:00 PM",
+          dinner: "10:00 PM" 
+        },
+        walk: {
+            morning:"8:00 AM",
+            evening:"6:00 PM"
+        },
+        play:{
+            morning:"10:00 AM",
+            evening:"8:00 PM"
+        }
+    })
+
+    return (
+    <PetContext.Provider value={{
+        pet, 
+        setPet, 
+        dogInfo, 
+        setDogInfo, 
+        walkProgressCounter, 
+        setWalkProgressCounter, 
+        walkLabel, 
+        setWalkLabel,
+        }}>
+        {children}
+    </PetContext.Provider>
+)
 }
 
-return (
-    <PetProvider>
-        {children}
-    </PetProvider>
-)
