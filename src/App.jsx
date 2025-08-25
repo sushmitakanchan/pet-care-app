@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import WalkTracker from './components/WalkTracker';
 import BathTracker from './components/BathTracker';
 import FeedTracker from './components/FeedTracker';
+import PlayTracker from './components/PlayTracker';
 
 function App() {
   

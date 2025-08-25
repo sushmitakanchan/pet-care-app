@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { PetContext } from '../context/PetContext'
 
 const WalkTracker = () => {
-    const {dogInfo, walkProgressCounter, setWalkProgressCounter,walkLabel, setWalkLabel, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel} = useContext(PetContext)
+    const {dogInfo, walkProgressCounter, setWalkProgressCounter,walkLabel, setWalkLabel, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel} = useContext(PetContext)
     const navigate = useNavigate();
 
     const handleWalk = () =>{
@@ -21,38 +21,46 @@ const WalkTracker = () => {
     }
   }, [walkProgressCounter, dogInfo.walk, setWalkLabel]);
 
-    // const progressPercentage = ()=>(walkProgressCounter / 2) * 100;
-
   return (
     <div className='bg-[#1b1a1a] h-screen w-screen m-0 p-0 flex justify-center items-center'>
     <div className='relative bg-[#64D264] h-[40rem] w-[50rem] grid grid-cols-2 grid-rows-6 gap-[10px] p-[10px] place-items-center'>
         <div className='flex flex-col items-center mt-[20px]'>
         <div className=' relative border border-black w-[20rem] h-[3rem] overflow-hidden'>
-            <div className=" absolute left-0 top-0 h-full bg-[#069f06] transition-all duration-500 p-[10px] text-[10px] items-center"
-            style={{ width: `${(walkProgressCounter / 2) * 100}%` }}>{`+${(walkProgressCounter / 2) * 100}%`}</div>
+            {walkProgressCounter > 0 && (
+            <div className=" absolute left-0 top-0 h-full bg-[#2dd12d] transition-all duration-500 p-[10px] text-[10px] items-center text-[#FFFFFF]"
+            style={{ width: `${(walkProgressCounter / 2) * 100}%` }}>{walkProgressCounter > 0 && `+${(walkProgressCounter / 2) * 100}%`}
+            </div>)}
         </div>
          <p className="mt-2 text-black text-[10px]">{walkLabel}</p>
         </div>
         
         <div className='flex flex-col items-center mt-[20px]'>
         <div className='relative border border-black w-[20rem] h-[3rem] overflow-hidden'>
-            <div className=" absolute left-0 top-0 h-full bg-[#0678f1] transition-all duration-500 p-[10px] text-[10px] items-center"
-            style={{ width: `${bathProgressCounter}%` }}>{`+${bathProgressCounter}%`}</div>
+           {bathProgressCounter > 0 && ( 
+            <div className=" absolute left-0 top-0 h-full bg-[#0678f1] transition-all duration-500 p-[10px] text-[10px] items-center text-[#FFFFFF]"
+            style={{ width: `${bathProgressCounter}%` }}>{`+${bathProgressCounter}%`}
+            </div>)}
         </div>
-         <p className="mt-2 text-black text-[10px]">{bathLabel}</p>
+         <p className="mt-2 text-black text-[10px]">{bathLabel ? bathLabel: `${dogInfo.name} is waiting for a shower!`}</p>
         </div>
 
         <div className='flex flex-col items-center'>
         <div className=' relative border border-black w-[20rem] h-[3rem] overflow-hidden'>
-            <div className=" absolute left-0 top-0 h-full bg-[#7e3ce1] transition-all duration-500 p-[10px] text-[10px] items-center"
-            style={{ width: `${(feedProgressCounter / 4) * 100}%` }}>{`${(feedProgressCounter / 4) * 100}%`}</div>
+           {feedProgressCounter > 0 && ( <div className=" absolute left-0 top-0 h-full bg-[#7e3ce1] transition-all duration-500 p-[10px] text-[10px] items-center text-[#FFFFFF]"
+            style={{ width: `${(feedProgressCounter / 4) * 100}%` }}>{`${(feedProgressCounter / 4) * 100}%`}
+            </div>)}
         </div>
         <p className="mt-2 text-black text-[10px]">{feedLabel ? feedLabel : `${dogInfo.name} is hungrryyyyy`}</p>
         </div>
 
         <div className='flex flex-col items-center'>
-        <div className='border border-black w-[20rem] h-[3rem] flex text-black justify-center items-center'></div>
-         <p className="mt-2 text-black text-[10px]">Label 4</p>
+        <div className=' relative border border-black w-[20rem] h-[3rem] overflow-hidden'>
+            {playProgressCounter > 0 && (
+              <div className=" absolute left-0 top-0 h-full bg-[#d80b7f] transition-all duration-500 p-[10px] text-[10px] items-center text-[#FFFFFF]"
+            style={{ width: `${(playProgressCounter / 2) * 100}%` }}>{`+${(playProgressCounter / 2) * 100}%`}
+            </div>)}
+        </div>
+         <p className="mt-2 text-black text-[10px]">{playLabel ? playLabel: `${dogInfo.name} needs your attention`}</p>
         </div>
         <img src={dogwalk} className='absolute mt-[5rem] size-[20rem]' />
         <div className='absolute flex gap-[20px] mt-[30rem]'>

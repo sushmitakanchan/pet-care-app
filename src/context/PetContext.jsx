@@ -9,6 +9,8 @@ export const PetProvider = ({children})=>{
     const [bathLabel, setBathLabel] = useState('')
     const [feedProgressCounter, setFeedProgressCounter] = useState(0)
     const [feedLabel, setFeedLabel] = useState('')
+    const [playProgressCounter, setPlayProgressCounter] = useState(0)
+    const [playLabel, setPlayLabel] = useState('')
     const [dogInfo, setDogInfo] = useState({
         name:"Bruno",
         sex: "M",
@@ -47,6 +49,10 @@ export const PetProvider = ({children})=>{
         setFeedProgressCounter,
         feedLabel,
         setFeedLabel,
+        playProgressCounter,
+        setPlayProgressCounter,
+        playLabel,
+        setPlayLabel
         }}>
         {children}
     </PetContext.Provider>
