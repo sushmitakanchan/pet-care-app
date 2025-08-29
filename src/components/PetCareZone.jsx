@@ -4,7 +4,7 @@ import dog from '../assets/dog.png'
 import { PetContext } from '../context/PetContext'
 
 const PetCareZone = () => {
-    const {dogInfo, walkProgressCounter, walkLabel, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel} = useContext(PetContext)
+    const {petInfo, walkProgressCounter, walkLabel, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel} = useContext(PetContext)
     const navigate = useNavigate();
 
   return (
@@ -17,7 +17,7 @@ const PetCareZone = () => {
             style={{ width: `${(walkProgressCounter / 2) * 100}%` }}>{walkProgressCounter > 0 && `+${(walkProgressCounter / 2) * 100}%`}
             </div>)}
         </div>
-         <p className="mt-2 text-black text-[10px]">{walkLabel>0 ? walkLabel: `Take ${dogInfo.name} for a walk!`}</p>
+         <p className="mt-2 text-black text-[10px]">{walkLabel>0 ? walkLabel: `Take ${petInfo?.basic?.name || "your pet"} for a walk!`}</p>
         </div>
         
         <div className='flex flex-col items-center mt-[20px]'>
@@ -27,7 +27,7 @@ const PetCareZone = () => {
             style={{ width: `${bathProgressCounter}%` }}>{`+${bathProgressCounter}%`}
             </div>)}
         </div>
-         <p className="mt-2 text-black text-[10px]">{bathLabel ? bathLabel: `${dogInfo.name} is waiting for a shower!`}</p>
+         <p className="mt-2 text-black text-[10px]">{bathLabel ? bathLabel: `${petInfo?.basic?.name || "your pet"} is waiting for a shower!`}</p>
         </div>
 
         <div className='flex flex-col items-center'>
@@ -37,7 +37,7 @@ const PetCareZone = () => {
             style={{ width: `${(feedProgressCounter / 4) * 100}%` }}>{`+${(feedProgressCounter / 4) * 100}%`}
             </div>)}
         </div>
-        <p className="mt-2 text-black text-[10px]">{feedLabel ? feedLabel : `${dogInfo.name} is hungrryyyyy`}</p>
+        <p className="mt-2 text-black text-[10px]">{feedLabel ? feedLabel : `${petInfo?.basic?.name || "your pet"} is hungrryyyyy`}</p>
         </div>
 
         <div className='flex flex-col items-center'>
@@ -47,7 +47,7 @@ const PetCareZone = () => {
             style={{ width: `${(playProgressCounter / 2) * 100}%` }}>{`+${(playProgressCounter / 2) * 100}%`}
             </div>)}
         </div>
-         <p className="mt-2 text-black text-[10px]">{playLabel ? playLabel: `${dogInfo.name} needs your attention`}</p>
+         <p className="mt-2 text-black text-[10px]">{playLabel ? playLabel: `${petInfo?.basic?.name || "your pet"} needs your attention`}</p>
         </div>
         </div>
         <img src={dog} className='absolute mt-[5rem]' />

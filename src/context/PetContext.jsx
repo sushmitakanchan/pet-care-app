@@ -1,8 +1,11 @@
-import { Children, createContext, useContext, useState } from "react";
+import { Children, createContext, useContext, useState, useEffect } from "react";
 
 export const PetContext = createContext();
 export const PetProvider = ({children})=>{
-    const [pet, setPet] = useState('')
+    const [pet, setPet] = useState(()=>{
+        const stored = localStorage.getItem("PetInfo");
+        return stored ? JSON.parse(stored) : { basic: {}, additional: {} };
+    })
     const [walkProgressCounter, setWalkProgressCounter] = useState(0)
     const [walkLabel, setWalkLabel] = useState('')
     const [bathProgressCounter, setBathProgressCounter] = useState(0)
@@ -11,32 +14,38 @@ export const PetProvider = ({children})=>{
     const [feedLabel, setFeedLabel] = useState('')
     const [playProgressCounter, setPlayProgressCounter] = useState(0)
     const [playLabel, setPlayLabel] = useState('')
-    const [dogInfo, setDogInfo] = useState({
-        name:"Bruno",
-        sex: "M",
-        bath: 1,
-        feed: {
-          morning: "9:00 AM",
-          afternoon: "1:00 PM",
-          snack: "5:00 PM",
-          dinner: "10:00 PM" 
+    const [petInfo, setPetInfo] = useState({
+        basic:{
+            name:"",
+            age:"",
+            sex:"",
+            breed: "",
+            type: pet
         },
-        walk: {
-            morning:"8:00 AM",
-            evening:"6:00 PM"
+        additional: {
+            feed: [],
+            play: [],
+            walk: [],
+            bath: []
         },
-        play:{
-            morning:"10:00 AM",
-            evening:"8:00 PM"
-        }
+        attributes: {
+            hunger: 50,     // will change automatically + with user actions
+            happiness: 70,
+            energy: 80,
+            hygiene: 90
+         }
     })
-
+    useEffect(() => {
+    if (petInfo) {
+    localStorage.setItem("PetInfo", JSON.stringify(petInfo));
+    }
+    }, [petInfo]);
     return (
     <PetContext.Provider value={{
         pet, 
         setPet, 
-        dogInfo, 
-        setDogInfo, 
+        petInfo, 
+        setPetInfo, 
         walkProgressCounter, 
         setWalkProgressCounter, 
         walkLabel, 

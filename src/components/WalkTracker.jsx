@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { PetContext } from '../context/PetContext'
 
 const WalkTracker = () => {
-    const {dogInfo, walkProgressCounter, setWalkProgressCounter,walkLabel, setWalkLabel, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel} = useContext(PetContext)
+    const {petInfo, walkProgressCounter, setWalkProgressCounter,walkLabel, setWalkLabel, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel} = useContext(PetContext)
     const navigate = useNavigate();
 
     const handleWalk = () =>{
@@ -13,9 +13,9 @@ const WalkTracker = () => {
     }
   useEffect(() => {
     if (walkProgressCounter === 0) {
-      setWalkLabel(`Next walk: Morning at ${dogInfo.walk.morning}`);
+      setWalkLabel(`Next walk: Morning at ${petInfo.walk.morning}`);
     } else if (walkProgressCounter === 1) {
-      setWalkLabel(`Next walk: Evening at ${dogInfo.walk.evening}`);
+      setWalkLabel(`Next walk: Evening at ${petInfo.walk.evening}`);
     } else {
       setWalkLabel("All walks done!");
     }
