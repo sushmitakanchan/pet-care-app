@@ -1,10 +1,10 @@
-import { Children, createContext, useContext, useState, useEffect } from "react";
+import { children, createContext, useContext, useState, useEffect } from "react";
 
 export const PetContext = createContext();
 export const PetProvider = ({children})=>{
     const [pet, setPet] = useState(()=>{
-        const stored = localStorage.getItem("PetInfo");
-        return stored ? JSON.parse(stored) : { basic: {}, additional: {} };
+        const stored = localStorage.getItem("SelectedPet");
+        return stored ? stored : "";
     })
     const [walkProgressCounter, setWalkProgressCounter] = useState(0)
     const [walkLabel, setWalkLabel] = useState('')
@@ -14,13 +14,15 @@ export const PetProvider = ({children})=>{
     const [feedLabel, setFeedLabel] = useState('')
     const [playProgressCounter, setPlayProgressCounter] = useState(0)
     const [playLabel, setPlayLabel] = useState('')
-    const [petInfo, setPetInfo] = useState({
+    const [petInfo, setPetInfo] = useState(()=>{
+        const stored = localStorage.getItem("PetInfo");
+        return stored ? JSON.parse(stored) : {
         basic:{
             name:"",
             age:"",
             sex:"",
             breed: "",
-            type: pet
+            type: ""
         },
         additional: {
             feed: [],
@@ -34,12 +36,23 @@ export const PetProvider = ({children})=>{
             energy: 80,
             hygiene: 90
          }
-    })
+    }})
+    const totalWalks = petInfo?.additional?.walk ? Object.values(petInfo.additional.walk).length: 0;
+
+    useEffect(()=>{
+        localStorage.setItem("PetInfo", JSON.stringify(petInfo));
+    }, [petInfo])
+
     useEffect(() => {
-    if (petInfo) {
-    localStorage.setItem("PetInfo", JSON.stringify(petInfo));
+    if (pet) {
+    localStorage.setItem("SelectedPet", pet);
+          setPetInfo((prev) => ({
+        ...prev,
+        basic: { ...prev.basic, type: pet },
+      }));
     }
-    }, [petInfo]);
+    }, [pet]);
+
     return (
     <PetContext.Provider value={{
         pet, 
@@ -50,6 +63,7 @@ export const PetProvider = ({children})=>{
         setWalkProgressCounter, 
         walkLabel, 
         setWalkLabel,
+        totalWalks,
         bathProgressCounter,
         setBathProgressCounter,
         bathLabel,

@@ -4,22 +4,45 @@ import { useNavigate } from 'react-router-dom'
 import { PetContext } from '../context/PetContext'
 
 const WalkTracker = () => {
-    const {petInfo, walkProgressCounter, setWalkProgressCounter,walkLabel, setWalkLabel, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel} = useContext(PetContext)
+    const {petInfo, walkProgressCounter, setWalkProgressCounter,walkLabel, setWalkLabel,totalWalks, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel} = useContext(PetContext)
     const navigate = useNavigate();
 
-    const handleWalk = () =>{
-        if (walkProgressCounter >= 2) return;
-        setWalkProgressCounter(walkProgressCounter + 1)
-    }
+
+      // Load walk progress from localStorage on mount
   useEffect(() => {
-    if (walkProgressCounter === 0) {
-      setWalkLabel(`Next walk: Morning at ${petInfo.walk.morning}`);
-    } else if (walkProgressCounter === 1) {
-      setWalkLabel(`Next walk: Evening at ${petInfo.walk.evening}`);
+    const savedProgress = localStorage.getItem("walkProgressCounter");
+    if (savedProgress) {
+      setWalkProgressCounter(Number(savedProgress));
     } else {
-      setWalkLabel("All walks done!");
+      setWalkProgressCounter(0);
     }
-  }, [walkProgressCounter, dogInfo.walk, setWalkLabel]);
+  }, [setWalkProgressCounter]);
+
+    // Persist walk progress to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("walkProgressCounter", walkProgressCounter);
+  }, [walkProgressCounter]);
+
+    const handleWalk = () =>{
+    if (walkProgressCounter >= totalWalks) return;
+    setWalkProgressCounter(walkProgressCounter + 1);
+    }
+useEffect(() => {
+    const walkList = petInfo?.additional?.walk
+    ? Object.values(petInfo.additional.walk)
+    : [];
+
+    if (walkList.length === 0) {
+    setWalkLabel("No walks scheduled!");
+    return;
+    }
+
+    if (walkProgressCounter < walkList.length) {
+    setWalkLabel(`Next walk: ${walkList[walkProgressCounter]}`);
+  } else {
+    setWalkLabel("All walks done!");
+  }
+  }, [walkProgressCounter, petInfo, setWalkLabel]);
 
   return (
     <div className='bg-[#1b1a1a] h-screen w-screen m-0 p-0 flex justify-center items-center'>
@@ -28,7 +51,7 @@ const WalkTracker = () => {
         <div className=' relative border border-black w-[20rem] h-[3rem] overflow-hidden'>
             {walkProgressCounter > 0 && (
             <div className=" absolute left-0 top-0 h-full bg-[#2dd12d] transition-all duration-500 p-[10px] text-[10px] items-center text-[#FFFFFF]"
-            style={{ width: `${(walkProgressCounter / 2) * 100}%` }}>{walkProgressCounter > 0 && `+${(walkProgressCounter / 2) * 100}%`}
+            style={{ width: `${totalWalks > 0 ? (walkProgressCounter / totalWalks) * 100 : 0}%` }}>{totalWalks > 0 && `+${Math.round((walkProgressCounter / totalWalks) * 100)}%`}
             </div>)}
         </div>
          <p className="mt-2 text-black text-[10px]">{walkLabel}</p>

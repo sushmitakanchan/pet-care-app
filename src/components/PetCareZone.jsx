@@ -4,7 +4,7 @@ import dog from '../assets/dog.png'
 import { PetContext } from '../context/PetContext'
 
 const PetCareZone = () => {
-    const {petInfo, walkProgressCounter, walkLabel, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel} = useContext(PetContext)
+    const {petInfo, walkProgressCounter, walkLabel,totalWalks, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel} = useContext(PetContext)
     const navigate = useNavigate();
 
   return (
@@ -14,10 +14,10 @@ const PetCareZone = () => {
         <div className=' relative border border-black w-[20rem] h-[3rem] overflow-hidden'>
             {walkProgressCounter > 0 && (
             <div className=" absolute left-0 top-0 h-full bg-[#64D264] transition-all duration-500 p-[10px] text-[10px] items-center text-[#FFFFFF]"
-            style={{ width: `${(walkProgressCounter / 2) * 100}%` }}>{walkProgressCounter > 0 && `+${(walkProgressCounter / 2) * 100}%`}
+            style={{ width: `${totalWalks > 0 ? (walkProgressCounter / totalWalks) * 100 : 0}%` }}>{totalWalks > 0 && `+${Math.round((walkProgressCounter / totalWalks) * 100)}%`}
             </div>)}
         </div>
-         <p className="mt-2 text-black text-[10px]">{walkLabel>0 ? walkLabel: `Take ${petInfo?.basic?.name || "your pet"} for a walk!`}</p>
+         <p className="mt-2 text-black text-[10px]">{walkLabel ? walkLabel: `Take ${petInfo?.basic?.name || "your pet"} for a walk!`}</p>
         </div>
         
         <div className='flex flex-col items-center mt-[20px]'>
