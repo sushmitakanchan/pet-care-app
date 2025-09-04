@@ -6,14 +6,25 @@ export const PetProvider = ({children})=>{
         const stored = localStorage.getItem("SelectedPet");
         return stored ? stored : "";
     })
-    const [walkProgressCounter, setWalkProgressCounter] = useState(0)
+    const [walkProgressCounter, setWalkProgressCounter] = useState(() => {
+    return Number(localStorage.getItem("walkProgressCounter")) || 0;
+  })
     const [walkLabel, setWalkLabel] = useState('')
-    const [bathProgressCounter, setBathProgressCounter] = useState(0)
+
+    const [bathProgressCounter, setBathProgressCounter] = useState(() => {
+    return Number(localStorage.getItem("bathProgressCounter")) || 0;
+  })
     const [bathLabel, setBathLabel] = useState('')
-    const [feedProgressCounter, setFeedProgressCounter] = useState(0)
+    const [feedProgressCounter, setFeedProgressCounter] = useState(() => {
+    return Number(localStorage.getItem("feedProgressCounter")) || 0;
+  })
     const [feedLabel, setFeedLabel] = useState('')
-    const [playProgressCounter, setPlayProgressCounter] = useState(0)
+
+    const [playProgressCounter, setPlayProgressCounter] = useState(() => {
+    return Number(localStorage.getItem("playProgressCounter")) || 0;
+  })
     const [playLabel, setPlayLabel] = useState('')
+    
     const [petInfo, setPetInfo] = useState(()=>{
         const stored = localStorage.getItem("PetInfo");
         return stored ? JSON.parse(stored) : {
@@ -37,7 +48,29 @@ export const PetProvider = ({children})=>{
             hygiene: 90
          }
     }})
+
+  // Save counters whenever they change
+  useEffect(() => {
+    localStorage.setItem("feedProgressCounter", feedProgressCounter);
+  }, [feedProgressCounter]);
+
+  useEffect(() => {
+    localStorage.setItem("walkProgressCounter", walkProgressCounter);
+  }, [walkProgressCounter]);
+
+  useEffect(() => {
+    localStorage.setItem("bathProgressCounter", bathProgressCounter);
+  }, [bathProgressCounter]);
+
+  useEffect(() => {
+    localStorage.setItem("playProgressCounter", playProgressCounter);
+  }, [playProgressCounter]);
+
+
     const totalWalks = petInfo?.additional?.walk ? Object.values(petInfo.additional.walk).length: 0;
+    const totalMeals = petInfo?.additional?.feed ? Object.values(petInfo.additional.feed).length: 0;
+    const totalBaths = petInfo?.additional?.bath ? Object.values(petInfo.additional.bath).length: 0;
+    const totalPlays = petInfo?.additional?.play ? Object.values(petInfo.additional.play).length: 0;
 
     useEffect(()=>{
         localStorage.setItem("PetInfo", JSON.stringify(petInfo));
@@ -68,14 +101,17 @@ export const PetProvider = ({children})=>{
         setBathProgressCounter,
         bathLabel,
         setBathLabel,
+        totalBaths,
         feedProgressCounter,
         setFeedProgressCounter,
         feedLabel,
         setFeedLabel,
+        totalMeals,
         playProgressCounter,
         setPlayProgressCounter,
         playLabel,
-        setPlayLabel
+        setPlayLabel,
+        totalPlays
         }}>
         {children}
     </PetContext.Provider>

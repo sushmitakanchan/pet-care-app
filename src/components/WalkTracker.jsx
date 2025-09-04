@@ -4,28 +4,28 @@ import { useNavigate } from 'react-router-dom'
 import { PetContext } from '../context/PetContext'
 
 const WalkTracker = () => {
-    const {petInfo, walkProgressCounter, setWalkProgressCounter,walkLabel, setWalkLabel,totalWalks, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel} = useContext(PetContext)
+    const {petInfo, walkProgressCounter, setWalkProgressCounter,walkLabel, setWalkLabel,totalWalks, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, totalMeals, playProgressCounter, playLabel, totalPlays, totalBaths} = useContext(PetContext)
     const navigate = useNavigate();
 
 
-      // Load walk progress from localStorage on mount
-  useEffect(() => {
-    const savedProgress = localStorage.getItem("walkProgressCounter");
-    if (savedProgress) {
-      setWalkProgressCounter(Number(savedProgress));
-    } else {
-      setWalkProgressCounter(0);
-    }
-  }, [setWalkProgressCounter]);
+  //     // Load walk progress from localStorage on mount
+  // useEffect(() => {
+  //   const savedProgress = localStorage.getItem("walkProgressCounter");
+  //   if (savedProgress) {
+  //     setWalkProgressCounter(Number(savedProgress));
+  //   } else {
+  //     setWalkProgressCounter(0);
+  //   }
+  // }, [setWalkProgressCounter]);
 
-    // Persist walk progress to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("walkProgressCounter", walkProgressCounter);
-  }, [walkProgressCounter]);
+  //   // Persist walk progress to localStorage whenever it changes
+  // useEffect(() => {
+  //   localStorage.setItem("walkProgressCounter", walkProgressCounter);
+  // }, [walkProgressCounter]);
 
     const handleWalk = () =>{
     if (walkProgressCounter >= totalWalks) return;
-    setWalkProgressCounter(walkProgressCounter + 1);
+    setWalkProgressCounter((prev) => prev + 1);
     }
 useEffect(() => {
     const walkList = petInfo?.additional?.walk
@@ -61,19 +61,19 @@ useEffect(() => {
         <div className='relative border border-black w-[20rem] h-[3rem] overflow-hidden'>
            {bathProgressCounter > 0 && ( 
             <div className=" absolute left-0 top-0 h-full bg-[#0678f1] transition-all duration-500 p-[10px] text-[10px] items-center text-[#FFFFFF]"
-            style={{ width: `${bathProgressCounter}%` }}>{`+${bathProgressCounter}%`}
+            style={{ width: `${totalBaths > 0 ? (bathProgressCounter/totalBaths)*100 : 0}%` }}>{totalBaths > 0 && `+${Math.round((bathProgressCounter / totalBaths) * 100)}%`}
             </div>)}
         </div>
-         <p className="mt-2 text-black text-[10px]">{bathLabel ? bathLabel: `${dogInfo.name} is waiting for a shower!`}</p>
+         <p className="mt-2 text-black text-[10px]">{bathLabel ? bathLabel: `${petInfo.basic.name} is waiting for a shower!`}</p>
         </div>
 
         <div className='flex flex-col items-center'>
         <div className=' relative border border-black w-[20rem] h-[3rem] overflow-hidden'>
            {feedProgressCounter > 0 && ( <div className=" absolute left-0 top-0 h-full bg-[#7e3ce1] transition-all duration-500 p-[10px] text-[10px] items-center text-[#FFFFFF]"
-            style={{ width: `${(feedProgressCounter / 4) * 100}%` }}>{`${(feedProgressCounter / 4) * 100}%`}
+            style={{ width: `${totalMeals > 0 ? (feedProgressCounter / totalMeals) * 100 : 0}%` }}>{totalMeals > 0 && `+${Math.round((feedProgressCounter / totalMeals) * 100)}%`}
             </div>)}
         </div>
-        <p className="mt-2 text-black text-[10px]">{feedLabel ? feedLabel : `${dogInfo.name} is hungrryyyyy`}</p>
+        <p className="mt-2 text-black text-[10px]">{feedLabel ? feedLabel : `${petInfo.basic.name} is hungrryyyyy`}</p>
         </div>
 
         <div className='flex flex-col items-center'>
@@ -83,7 +83,7 @@ useEffect(() => {
             style={{ width: `${(playProgressCounter / 2) * 100}%` }}>{`+${(playProgressCounter / 2) * 100}%`}
             </div>)}
         </div>
-         <p className="mt-2 text-black text-[10px]">{playLabel ? playLabel: `${dogInfo.name} needs your attention`}</p>
+         <p className="mt-2 text-black text-[10px]">{playLabel ? playLabel: `${petInfo.basic.name} needs your attention`}</p>
         </div>
         <img src={dogwalk} className='absolute mt-[5rem] size-[20rem]' />
         <div className='absolute flex gap-[20px] mt-[30rem]'>

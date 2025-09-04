@@ -4,7 +4,7 @@ import dog from '../assets/dog.png'
 import { PetContext } from '../context/PetContext'
 
 const PetCareZone = () => {
-    const {petInfo, walkProgressCounter, walkLabel,totalWalks, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel} = useContext(PetContext)
+    const {petInfo, walkProgressCounter, walkLabel, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel, totalWalks, totalMeals, totalPlays, totalBaths} = useContext(PetContext)
     const navigate = useNavigate();
 
   return (
@@ -24,7 +24,7 @@ const PetCareZone = () => {
         <div className='relative border border-black w-[20rem] h-[3rem] overflow-hidden'>
             {bathProgressCounter > 0 && (
               <div className=" absolute left-0 top-0 h-full bg-[#0678f1] transition-all duration-500 p-[10px] text-[10px] items-center text-[#FFFFFF]"
-            style={{ width: `${bathProgressCounter}%` }}>{`+${bathProgressCounter}%`}
+            style={{ width: `${totalBaths > 0 ? (bathProgressCounter/totalBaths)*100 : 0}%` }}>{totalBaths > 0 && `+${Math.round((bathProgressCounter / totalBaths) * 100)}%`}
             </div>)}
         </div>
          <p className="mt-2 text-black text-[10px]">{bathLabel ? bathLabel: `${petInfo?.basic?.name || "your pet"} is waiting for a shower!`}</p>
@@ -34,7 +34,7 @@ const PetCareZone = () => {
         <div className=' relative border border-black w-[20rem] h-[3rem] overflow-hidden'>
             {feedProgressCounter > 0 && (
               <div className=" absolute left-0 top-0 h-full bg-[#7e3ce1] transition-all duration-500 p-[10px] text-[10px] items-center text-[#FFFFFF]"
-            style={{ width: `${(feedProgressCounter / 4) * 100}%` }}>{`+${(feedProgressCounter / 4) * 100}%`}
+            style={{ width: `${totalMeals > 0 ? (feedProgressCounter / totalMeals) * 100 : 0}%` }}>{totalMeals > 0 && `+${Math.round((feedProgressCounter / totalMeals) * 100)}%`}
             </div>)}
         </div>
         <p className="mt-2 text-black text-[10px]">{feedLabel ? feedLabel : `${petInfo?.basic?.name || "your pet"} is hungrryyyyy`}</p>
