@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import dog from '../assets/dog.png'
+import more from '../assets/more.png'
 import { PetContext } from '../context/PetContext'
 
 const PetCareZone = () => {
@@ -50,7 +51,7 @@ const PetCareZone = () => {
          <p className="mt-2 text-black text-[10px]">{playLabel ? playLabel: `${petInfo?.basic?.name || "your pet"} needs your attention`}</p>
         </div>
         </div>
-        <img src={dog} className='absolute mt-[5rem]' />
+        <img src={dog} className='absolute mt-[5rem]' onClick={()=>navigate('/pet-care-zone/pet-moods')}/>
         <div className='absolute flex gap-[20px] mt-[30rem]'>
         <button className="bg-[#64D264] w-[80px] h-[60px] shadow-[2px_6px_2px_#b91c1c] active:translate-y-1 active:shadow-[0_3px_0_#b91c1c] mt-[30px]" onClick={()=>navigate('/pet-walk')}>WALK</button>
         <button className="bg-[#3296FF] w-[80px] h-[60px] shadow-[2px_6px_2px_#b91c1c] active:translate-y-1 active:shadow-[0_3px_0_#b91c1c] mt-[30px]" onClick={()=>navigate('/pet-bath')}>BATH</button>
