@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import logo from '../assets/logo.png'
 import dog from '../assets/dog.png'
 import cat from '../assets/cat.png'
-import { PetContext } from '../context/PetContext'
+import { PetContext, PetProvider } from "../context/PetContext";
 import { useNavigate } from 'react-router-dom'
 
 const ChooseYourPet = () => {

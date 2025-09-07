@@ -1,5 +1,5 @@
 import React , {useContext, useEffect} from 'react'
-import { PetContext } from '../context/PetContext'
+import { PetContext, PetProvider } from "../context/PetContext";
 import dogbath from '../assets/dog-bath.png'
 import { useNavigate } from 'react-router-dom'
 

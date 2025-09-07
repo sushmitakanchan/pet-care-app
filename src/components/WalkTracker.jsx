@@ -1,27 +1,12 @@
 import React, {useContext, useState, useEffect} from 'react'
 import dogwalk from "../assets/dog-walk.png"
 import { useNavigate } from 'react-router-dom'
-import { PetContext } from '../context/PetContext'
+import { PetContext, PetProvider } from "../context/PetContext";
+
 
 const WalkTracker = () => {
     const {petInfo, walkProgressCounter, setWalkProgressCounter,walkLabel, setWalkLabel,totalWalks, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, totalMeals, playProgressCounter, playLabel, totalPlays, totalBaths} = useContext(PetContext)
     const navigate = useNavigate();
-
-
-  //     // Load walk progress from localStorage on mount
-  // useEffect(() => {
-  //   const savedProgress = localStorage.getItem("walkProgressCounter");
-  //   if (savedProgress) {
-  //     setWalkProgressCounter(Number(savedProgress));
-  //   } else {
-  //     setWalkProgressCounter(0);
-  //   }
-  // }, [setWalkProgressCounter]);
-
-  //   // Persist walk progress to localStorage whenever it changes
-  // useEffect(() => {
-  //   localStorage.setItem("walkProgressCounter", walkProgressCounter);
-  // }, [walkProgressCounter]);
 
     const handleWalk = () =>{
     if (walkProgressCounter >= totalWalks) return;

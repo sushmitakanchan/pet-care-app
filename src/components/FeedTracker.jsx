@@ -1,10 +1,10 @@
 import React , {useContext, useEffect} from 'react'
-import { PetContext } from '../context/PetContext'
+import { PetContext, PetProvider } from "../context/PetContext";
 import { useNavigate } from 'react-router-dom'
 import dogfeed from '../assets/dogfeed.png'
 
 const FeedTracker = () => {
-    const {petInfo, walkProgressCounter, walkLabel, bathProgressCounter, bathLabel, feedProgressCounter, setFeedProgressCounter, feedLabel, setFeedLabel, playProgressCounter, playLabel, totalWalks, totalMeals, totalPlays, totalBaths} = useContext(PetContext)
+    const {petInfo, setPetInfo, walkProgressCounter, walkLabel, bathProgressCounter, bathLabel, feedProgressCounter, setFeedProgressCounter, feedLabel, setFeedLabel, playProgressCounter, playLabel, totalWalks, totalMeals, totalPlays, totalBaths} = useContext(PetContext)
     const navigate = useNavigate()
 
       useEffect(() => {
@@ -23,6 +23,14 @@ const FeedTracker = () => {
     const handleFeed = ()=>{
         if(feedProgressCounter>=totalMeals) return;
         setFeedProgressCounter((prev) => prev + 1)
+         setPetInfo(prev => ({
+         ...prev,
+        attributes: {
+            ...prev.attributes,
+        hunger: Math.max(prev.attributes.hunger - 10, 0), // feeding reduces hunger
+        energy: Math.min(prev.attributes.energy + 5, 100), // optional boost
+    }
+  }));
     }
 
     useEffect(()=>{

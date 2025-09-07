@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import dog from '../assets/dog.png'
 import more from '../assets/more.png'
-import { PetContext } from '../context/PetContext'
+import { PetContext, PetProvider } from "../context/PetContext";
 
 const PetCareZone = () => {
     const {petInfo, walkProgressCounter, walkLabel, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel, totalWalks, totalMeals, totalPlays, totalBaths} = useContext(PetContext)

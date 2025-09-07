@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useContext } from 'react'
-import { PetContext } from '../context/PetContext'
+import { PetContext, PetProvider } from "../context/PetContext";
 import { useNavigate } from 'react-router-dom'
 import dogplay from '../assets/dogplay.png'
 

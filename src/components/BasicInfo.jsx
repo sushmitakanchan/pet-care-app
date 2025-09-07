@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import dog from '../assets/dog.png'
-import { PetContext } from '../context/PetContext'
+import { PetContext, PetProvider } from "../context/PetContext";
 import { useNavigate } from 'react-router-dom'
 
 const BasicInfo = () => {

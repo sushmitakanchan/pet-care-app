@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { PetContext } from '../context/PetContext'
+import { PetContext, PetProvider } from "../context/PetContext";
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

@@ -14,8 +14,7 @@ import WalkSchedule from './components/WalkSchedule';
 import BathSchedule from './components/BathSchedule';
 import FeedSchedule from './components/FeedSchedule';
 import PlaySchedule from './components/PlaySchedule';
-// import PetMoods from './components/PetMoods';
-// import PetAttributeBars from './components/PetAttributesBars';
+import PetAttributeBars from './components/PetAttributesBars';
 
 function App() {
   
@@ -36,7 +35,7 @@ function App() {
       <Route path='/bath-schedule' element={<BathSchedule/>}/>
       <Route path='/feed-schedule' element={<FeedSchedule/>}/>
       <Route path='/play-schedule' element={<PlaySchedule/>}/>
-      {/* <Route path='/pet-care-zone/pet-moods' element={<PetAttributeBars/>}/> */}
+      <Route path='/pet-care-zone/pet-moods' element={<PetAttributeBars/>}/>
       </Routes>
       </Router>
     </PetProvider>
