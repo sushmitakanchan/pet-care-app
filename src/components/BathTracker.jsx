@@ -4,7 +4,7 @@ import dogbath from '../assets/dog-bath.png'
 import { useNavigate } from 'react-router-dom'
 
 const BathTracker = () => {
-const {petInfo, walkProgressCounter,walkLabel, bathProgressCounter, setBathProgressCounter, bathLabel, setBathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel, totalWalks, totalMeals, totalPlays, totalBaths} = useContext(PetContext)
+const {petInfo,setPetInfo, walkProgressCounter,walkLabel, bathProgressCounter, setBathProgressCounter, bathLabel, setBathLabel, feedProgressCounter, feedLabel, playProgressCounter, playLabel, totalWalks, totalMeals, totalPlays, totalBaths} = useContext(PetContext)
 const navigate = useNavigate()
 
   useEffect(() => {
@@ -23,6 +23,15 @@ const navigate = useNavigate()
     const handleBath = () =>{
         if (bathProgressCounter >= totalBaths) return;
         setBathProgressCounter(bathProgressCounter + 1);
+                    setPetInfo(prev => ({
+         ...prev,
+        attributes: {
+            ...prev.attributes,
+        hygiene: Math.max(prev.attributes.hygiene + 100, 100), // walking increases hunger
+        energy: Math.min(prev.attributes.energy + 20, 100), //walking reduces energy
+        happiness: Math.min(prev.attributes.happiness + 20, 0) //increases happiness
+    }
+  }));
         }
 
     useEffect(() => {

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import dogplay from '../assets/dogplay.png'
 
 const PlayTracker = () => {
-    const {petInfo, walkProgressCounter, walkLabel, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, setPlayProgressCounter, playLabel,setPlayLabel, totalWalks, totalMeals, totalPlays, totalBaths} = useContext(PetContext)
+    const {petInfo, setPetInfo, walkProgressCounter, walkLabel, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, playProgressCounter, setPlayProgressCounter, playLabel,setPlayLabel, totalWalks, totalMeals, totalPlays, totalBaths} = useContext(PetContext)
     const navigate = useNavigate()
 
       useEffect(() => {
@@ -24,6 +24,15 @@ const PlayTracker = () => {
         const handlePlay = () =>{
             if (playProgressCounter >= totalPlays) return;
             setPlayProgressCounter(playProgressCounter + 1);
+            setPetInfo(prev => ({
+         ...prev,
+        attributes: {
+            ...prev.attributes,
+        hunger: Math.max(prev.attributes.hunger + 20, 0), // walking increases hunger
+        energy: Math.min(prev.attributes.energy + 20, 100), //walking reduces energy
+        happiness: Math.min(prev.attributes.happiness + 20, 0) //increases happiness
+    }
+  }));
             }
     
         useEffect(() => {

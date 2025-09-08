@@ -5,13 +5,23 @@ import { PetContext, PetProvider } from "../context/PetContext";
 
 
 const WalkTracker = () => {
-    const {petInfo, walkProgressCounter, setWalkProgressCounter,walkLabel, setWalkLabel,totalWalks, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, totalMeals, playProgressCounter, playLabel, totalPlays, totalBaths} = useContext(PetContext)
+    const {petInfo, setPetInfo, walkProgressCounter, setWalkProgressCounter,walkLabel, setWalkLabel,totalWalks, bathProgressCounter, bathLabel, feedProgressCounter, feedLabel, totalMeals, playProgressCounter, playLabel, totalPlays, totalBaths} = useContext(PetContext)
     const navigate = useNavigate();
 
     const handleWalk = () =>{
     if (walkProgressCounter >= totalWalks) return;
     setWalkProgressCounter((prev) => prev + 1);
+     setPetInfo(prev => ({
+         ...prev,
+        attributes: {
+            ...prev.attributes,
+        hunger: Math.max(prev.attributes.hunger + 10, 0), // walking increases hunger
+        energy: Math.min(prev.attributes.energy - 10, 100), //walking reduces energy
+        hygiene: Math.min(prev.attributes.hygiene - 5, 0),
+        happiness: Math.min(prev.attributes.happiness + 10, 0) //increases happiness
     }
+  }));
+}
 useEffect(() => {
     const walkList = petInfo?.additional?.walk
     ? Object.values(petInfo.additional.walk)
@@ -79,5 +89,4 @@ useEffect(() => {
     </div>
   )
 }
-
-export default WalkTracker
+export default WalkTracker;

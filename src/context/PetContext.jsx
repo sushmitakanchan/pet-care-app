@@ -53,6 +53,33 @@ export const PetProvider = ({children})=>{
     
   })
 
+  const resetPetInfo = () => {
+    localStorage.removeItem("PetInfo");
+    localStorage.removeItem("walkProgressCounter");
+    localStorage.removeItem("feedProgressCounter");
+    localStorage.removeItem("bathProgressCounter");
+    localStorage.removeItem("playProgressCounter");
+    setPetInfo({
+      basic: { name: "", age: "", sex: "", breed: "", type: "" },
+      additional: { feed: {}, play: {}, walk: {}, bath: {} },
+      attributes: { hunger: 70, happiness: 80, energy: 60, hygiene: 90 },
+    });
+
+      setWalkProgressCounter(0);
+      setFeedProgressCounter(0);
+      setBathProgressCounter(0);
+      setPlayProgressCounter(0);
+  };
+
+   useEffect(() => {
+    const stored = localStorage.getItem("PetInfo");
+  if (!stored) {
+    resetPetInfo();
+  }
+  }, []); // empty dependency → only runs once at startup
+
+
+
 
   // Save counters whenever they change
   useEffect(() => {
@@ -81,11 +108,28 @@ export const PetProvider = ({children})=>{
         localStorage.setItem("PetInfo", JSON.stringify(petInfo));
     }, [petInfo])
 
+const areSchedulesComplete = (additional) => {
+  return (
+    additional.feed && Object.values(additional.feed).length > 0 &&
+    additional.play && Object.values(additional.play).length > 0 &&
+    additional.walk && Object.values(additional.walk).length > 0 &&
+    additional.bath && Object.values(additional.bath).length > 0
+  );
+};
 // Runs every 2 seconds to update pet's attributes
 useEffect(() => {
   const interval = setInterval(() => {
     setPetInfo((prevPetInfo) => {
       // Copy current attributes
+      if (!prevPetInfo.basic.name) {
+        return prevPetInfo;
+      }
+
+      if (!areSchedulesComplete(prevPetInfo.additional)) {
+        // Don't update attributes yet until all schedules are set
+        return prevPetInfo;
+      }
+
       let { hunger, happiness, energy, hygiene } = prevPetInfo.attributes;
 
       // 🕒 Natural changes over time
@@ -139,18 +183,20 @@ useEffect(() => {
 
 // Helper function: checks if a time has already passed today
 function isTaskMissed(timeString) {
-  const now = new Date();
-  const [hours, minutes, period] = timeString.match(/(\d+):(\d+) (\w+)/).slice(1);
-
+ if (!timeString || typeof timeString !== "string") return false;
+  const match = timeString.match(/(\d+):(\d+) (\w+)/);
+  if (!match) return false;
+  const [_, hours, minutes, period] = match;
   // Convert 12-hour format to 24-hour
   let hours24 = parseInt(hours);
   if (period === "PM" && hours24 !== 12) hours24 += 12;
   if (period === "AM" && hours24 === 12) hours24 = 0;
 
+  const now = new Date();
   const taskTime = new Date();
   taskTime.setHours(hours24, parseInt(minutes), 0, 0);
 
-  return now > taskTime; // true if current time has passed scheduled time
+  return now > taskTime;
 }
 
     return (
