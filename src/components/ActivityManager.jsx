@@ -5,7 +5,16 @@ import { useNavigate } from 'react-router-dom';
 
 const ActivityManager = ({type, label}) => {
     const {petInfo, setPetInfo} = useContext(PetContext)
-    const [entries, setEntries] = useState([{ id: 1, time: "" }]);
+    const [entries, setEntries] = useState(()=>{
+      const existing = petInfo?.additional?.[type];
+      if (existing && Object.keys(existing).length > 0) {
+      return Object.entries(existing).map(([id, time]) => {
+        const [hours, minutes, ampm] = time.split(/:| /);
+        return { id: Number(id), hours, minutes, ampm };
+      });
+    }
+    return [{ id: 1, hours: "", minutes: "", ampm: "" }];
+    });
     const navigate = useNavigate()
 
     const getOrdinal = (n) => {

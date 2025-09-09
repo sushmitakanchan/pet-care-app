@@ -27,9 +27,9 @@ const navigate = useNavigate()
          ...prev,
         attributes: {
             ...prev.attributes,
-        hygiene: Math.max(prev.attributes.hygiene + 100, 100), // walking increases hunger
-        energy: Math.min(prev.attributes.energy + 20, 100), //walking reduces energy
-        happiness: Math.min(prev.attributes.happiness + 20, 0) //increases happiness
+        hygiene: Math.min(prev.attributes.hygiene + 20, 100), // walking increases hunger
+        energy: Math.max(prev.attributes.energy - 5, 0), //walking reduces energy
+        happiness: Math.max(prev.attributes.happiness - 5, 0) //increases happiness
     }
   }));
         }

@@ -15,10 +15,10 @@ const WalkTracker = () => {
          ...prev,
         attributes: {
             ...prev.attributes,
-        hunger: Math.max(prev.attributes.hunger + 10, 0), // walking increases hunger
-        energy: Math.min(prev.attributes.energy - 10, 100), //walking reduces energy
-        hygiene: Math.min(prev.attributes.hygiene - 5, 0),
-        happiness: Math.min(prev.attributes.happiness + 10, 0) //increases happiness
+        hunger: Math.min(prev.attributes.hunger + 10, 100),
+      energy: Math.max(prev.attributes.energy - 10, 0),
+      happiness: Math.min(prev.attributes.happiness + 15, 100),
+      hygiene: Math.max(prev.attributes.hygiene - 5, 0),
     }
   }));
 }

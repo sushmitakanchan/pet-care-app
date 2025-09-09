@@ -2,6 +2,7 @@ import { children, createContext, useContext, useState, useEffect } from "react"
 
 export const PetContext = createContext();
 export const PetProvider = ({children})=>{
+    const [schedulesReady, setSchedulesReady] = useState(false);
     const [pet, setPet] = useState(()=>{
         const stored = localStorage.getItem("SelectedPet");
         return stored ? stored : "";
@@ -25,33 +26,18 @@ export const PetProvider = ({children})=>{
   })
     const [playLabel, setPlayLabel] = useState('')
     
-    const [petInfo, setPetInfo] = useState(()=>{
-        const stored = localStorage.getItem("PetInfo");
-        return stored ? JSON.parse(stored) : {
-        basic:{
-            name:"",
-            age:"",
-            sex:"",
-            breed: "",
-            type: ""
-        },
-        additional: {
-            feed: {},
-            play: {},
-            walk: {},
-            bath: {}
-        },
-        attributes: {
-          hunger: 70,
-          happiness: 80,
-          energy: 60,
-          hygiene: 90,
-         }
-         
-         
+  const [petInfo, setPetInfo] = useState(() => {
+    const stored = localStorage.getItem("PetInfo");
+    if (stored) {
+      return JSON.parse(stored);
     }
-    
-  })
+    // Default if no saved pet
+    return {
+      basic: { name: "", age: "", sex: "", breed: "", type: "" },
+      additional: { feed: {}, play: {}, walk: {}, bath: {} },
+      attributes: { hunger: 70, happiness: 80, energy: 60, hygiene: 90 },
+    };
+  });
 
   const resetPetInfo = () => {
     localStorage.removeItem("PetInfo");
@@ -71,15 +57,15 @@ export const PetProvider = ({children})=>{
       setPlayProgressCounter(0);
   };
 
-   useEffect(() => {
-    const stored = localStorage.getItem("PetInfo");
-  if (!stored) {
-    resetPetInfo();
-  }
-  }, []); // empty dependency → only runs once at startup
-
-
-
+  // 🆕 Handle session reset only on full browser restart
+  useEffect(() => {
+    const sessionAlive = sessionStorage.getItem("sessionAlive");
+    if (!sessionAlive) {
+      // new browser session → reset
+      resetPetInfo();
+      sessionStorage.setItem("sessionAlive", "true");
+    }
+  }, []);
 
   // Save counters whenever they change
   useEffect(() => {
@@ -125,7 +111,7 @@ useEffect(() => {
         return prevPetInfo;
       }
 
-      if (!areSchedulesComplete(prevPetInfo.additional)) {
+      if (!schedulesReady || !areSchedulesComplete(prevPetInfo.additional)) {
         // Don't update attributes yet until all schedules are set
         return prevPetInfo;
       }
@@ -174,7 +160,7 @@ useEffect(() => {
         attributes: { hunger, happiness, energy, hygiene }
       };
     });
-  }, 2000); // every 5 minutes
+  }, 600000); // every 5 minutes
 
   // cleanup: stop interval when component is removed
   return () => clearInterval(interval);
@@ -224,7 +210,8 @@ function isTaskMissed(timeString) {
         setPlayProgressCounter,
         playLabel,
         setPlayLabel,
-        totalPlays
+        totalPlays,
+        schedulesReady, setSchedulesReady
         }}>
         {children}
     </PetContext.Provider>

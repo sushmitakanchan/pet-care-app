@@ -28,9 +28,10 @@ const PlayTracker = () => {
          ...prev,
         attributes: {
             ...prev.attributes,
-        hunger: Math.max(prev.attributes.hunger + 20, 0), // walking increases hunger
-        energy: Math.min(prev.attributes.energy + 20, 100), //walking reduces energy
-        happiness: Math.min(prev.attributes.happiness + 20, 0) //increases happiness
+        happiness: Math.min(prev.attributes.happiness + 20, 100),
+        energy: Math.max(prev.attributes.energy - 15, 0),
+        hunger: Math.min(prev.attributes.hunger + 10, 100),
+        hygiene: Math.max(prev.attributes.hygiene - 3, 0),
     }
   }));
             }

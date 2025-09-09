@@ -3,8 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { PetContext, PetProvider } from "../context/PetContext";
 
 const AdditionalInfo = () => {
-  const {petInfo} = useContext(PetContext)
+  const {petInfo, setSchedulesReady} = useContext(PetContext)
   const navigate = useNavigate()
+  const handleNext = () =>{
+    setSchedulesReady(true);
+    navigate('/pet-care-zone')
+  }
   return (
     <div className='bg-[#1b1a1a] h-screen w-screen m-0 p-0 flex justify-center items-center'>
     <div className='relative bg-[#FF3232] h-[40rem] w-[50rem] mt-[3rem] mb-[3rem]'>
@@ -20,7 +24,7 @@ const AdditionalInfo = () => {
       </div>
       <div className='flex gap-[20px] justify-center items-center mt-[10rem] cursor-pointer'>
             <button className="bg-[#8d8b91] w-[90px] h-[50px] shadow-[2px_6px_2px_#b91c1c] active:translate-y-1 active:shadow-[0_3px_0_#b91c1c] mt-[30px]">BACK</button>
-            <button className="bg-[#FFC832] w-[90px] h-[50px] shadow-[2px_6px_2px_#b91c1c] active:translate-y-1 active:shadow-[0_3px_0_#b91c1c] mt-[30px]" onClick={()=>navigate('/pet-care-zone')} >NEXT</button>
+            <button className="bg-[#FFC832] w-[90px] h-[50px] shadow-[2px_6px_2px_#b91c1c] active:translate-y-1 active:shadow-[0_3px_0_#b91c1c] mt-[30px]" onClick={handleNext} >NEXT</button>
       </div>
 
       </div>

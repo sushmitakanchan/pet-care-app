@@ -27,8 +27,10 @@ const FeedTracker = () => {
          ...prev,
         attributes: {
             ...prev.attributes,
-        hunger: Math.max(prev.attributes.hunger - 10, 0), // feeding reduces hunger
-        energy: Math.min(prev.attributes.energy + 5, 100), // optional boost
+        hunger: Math.max(prev.attributes.hunger - 20, 0),   // reduce hunger
+        energy: Math.min(prev.attributes.energy + 10, 100), // increase energy
+        happiness: Math.min(prev.attributes.happiness + 5, 100), // happier
+        hygiene: Math.max(prev.attributes.hygiene - 2, 0),
     }
   }));
     }
