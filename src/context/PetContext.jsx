@@ -36,6 +36,10 @@ export const PetProvider = ({children})=>{
       basic: { name: "", age: "", sex: "", breed: "", type: "" },
       additional: { feed: {}, play: {}, walk: {}, bath: {} },
       attributes: { hunger: 70, happiness: 80, energy: 60, hygiene: 90 },
+      penalizedFeed: {},
+      penalizedBath: {},
+      penalizedPlay: {},
+      penalizedWalk: {},
     };
   });
 
@@ -124,54 +128,70 @@ useEffect(() => {
       happiness = Math.round(Math.max(happiness - 1, 0)); // happiness slowly goes DOWN
       hygiene = Math.round(Math.max(hygiene - 1, 0));     // hygiene slowly goes DOWN
 
+      let penalizedFeed = { ...prevPetInfo.penalizedFeed };
+      let penalizedBath = { ...prevPetInfo.penalizedBath };
+      let penalizedPlay = { ...prevPetInfo.penalizedPlay };
+      let penalizedWalk = { ...prevPetInfo.penalizedWalk };
+
       // 🕒 Check schedules and apply penalties if missed
       // FEED
       Object.entries(prevPetInfo.additional.feed || {}).forEach(([key, time]) => {
         // if the feeding time has passed AND we didn’t feed yet
-        if (isTaskMissed(time) && feedProgressCounter < Number(key)) {
-          hunger = Math.min(hunger + 1, 100); // pet gets hungrier
+        if (isTaskMissed(time) && !penalizedFeed[key]) {
+            hunger = Math.min(hunger + 5, 100); 
+            penalizedFeed[key] = true;
         }
       });
 
       // BATH
       Object.entries(prevPetInfo.additional.bath || {}).forEach(([key, time]) => {
-        if (isTaskMissed(time) && bathProgressCounter < Number(key)) {
-          hygiene = Math.max(hygiene - 1, 0); // pet gets dirtier
+        if (isTaskMissed(time) && !penalizedBath[key]) {
+          hygiene = Math.max(hygiene - 5, 0); // pet gets dirtier
+          penalizedBath[key] = true;
         }
       });
 
       // PLAY
       Object.entries(prevPetInfo.additional.play || {}).forEach(([key, time]) => {
-        if (isTaskMissed(time) && playProgressCounter < Number(key)) {
-          happiness = Math.max(happiness - 1, 0); // pet gets sadder
+        if (isTaskMissed(time) && !penalizedPlay[key]) {
+          happiness = Math.max(happiness - 5, 0); // pet gets sadder
+          penalizedPlay[key] = true;
         }
       });
 
       // WALK
       Object.entries(prevPetInfo.additional.walk || {}).forEach(([key, time]) => {
-        if (isTaskMissed(time) && walkProgressCounter < Number(key)) {
-          energy = Math.max(energy - 1, 0); // pet loses more energy
+        if (isTaskMissed(time) && !penalizedWalk[key]) {
+          energy = Math.max(energy - 5, 0); // pet loses more energy
+          penalizedWalk[key] = true;
         }
       });
 
       // Return updated pet info
       return {
         ...prevPetInfo,
-        attributes: { hunger, happiness, energy, hygiene }
+        attributes: { hunger, happiness, energy, hygiene },
+        penalizedFeed,
+        penalizedBath,
+        penalizedPlay,
+        penalizedWalk
       };
     });
-  }, 600000); // every 5 minutes
+  }, 5000); // every 5 minutes
 
   // cleanup: stop interval when component is removed
   return () => clearInterval(interval);
-}, [feedProgressCounter, bathProgressCounter, playProgressCounter, walkProgressCounter]);
+}, [schedulesReady]);
 
 
 // Helper function: checks if a time has already passed today
 function isTaskMissed(timeString) {
  if (!timeString || typeof timeString !== "string") return false;
   const match = timeString.match(/(\d+):(\d+) (\w+)/);
-  if (!match) return false;
+  if (!match) {
+    console.log("Time format not matched:", timeString);
+    return false;
+  }
   const [_, hours, minutes, period] = match;
   // Convert 12-hour format to 24-hour
   let hours24 = parseInt(hours);
@@ -182,6 +202,7 @@ function isTaskMissed(timeString) {
   const taskTime = new Date();
   taskTime.setHours(hours24, parseInt(minutes), 0, 0);
 
+  console.log("Task time:", taskTime, "Now:", now, "Missed?", now > taskTime);
   return now > taskTime;
 }
 

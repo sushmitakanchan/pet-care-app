@@ -36,7 +36,7 @@ const PetAttributeBars = () => {
           icon={energetic}
         />
       </div>
-      <button className="bg-[#FFC832] w-[60px] h-[30px] shadow-[2px_6px_2px_#b91c1c] active:translate-y-1 active:shadow-[0_3px_0_#b91c1c] mb-[2.5rem]" onClick={()=>navigate('/pet-care-zone')}>Next</button>
+      <button className="bg-[#FFC832] w-[60px] h-[30px] shadow-[2px_6px_2px_#b91c1c] active:translate-y-1 active:shadow-[0_3px_0_#b91c1c] mb-[2.5rem]" onClick={()=>navigate('/pet-care-zone')}>OK</button>
     </div>
   </div>
 );
