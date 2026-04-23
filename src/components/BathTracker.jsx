@@ -10,7 +10,7 @@ const BathTracker = () => {
 
   const handleBath = () => {
     if (bathProgressCounter >= totalBaths) return
-    setBathProgressCounter(bathProgressCounter + 1)
+    setBathProgressCounter(prev => prev + 1)
     setPetInfo(prev => ({
       ...prev,
       attributes: {

@@ -1,7 +1,19 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 
 export const PetContext = createContext();
+
+const safeSetItem = (key, value, onError) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    console.warn(`localStorage.setItem failed for key "${key}":`, e);
+    onError?.();
+  }
+};
+
 export const PetProvider = ({children})=>{
+  const [storageWarning, setStorageWarning] = useState(false);
+  const onStorageError = useCallback(() => setStorageWarning(true), []);
     const [schedulesReady, setSchedulesReady] = useState(() => {
         return sessionStorage.getItem("schedulesReady") === "true";
     });
@@ -32,7 +44,9 @@ export const PetProvider = ({children})=>{
     try {
       const stored = localStorage.getItem("PetInfo");
       if (stored) return JSON.parse(stored);
-    } catch {}
+    } catch (e) {
+      console.warn("PetInfo in localStorage is corrupted, resetting:", e);
+    }
     return {
       basic: { name: "", age: "", sex: "", breed: "", type: "" },
       additional: { feed: {}, play: {}, walk: {}, bath: {} },
@@ -91,7 +105,7 @@ export const PetProvider = ({children})=>{
         penalizedPlay: {},
         penalizedWalk: {},
       }));
-      localStorage.setItem("penaltyResetDate", today);
+      safeSetItem("penaltyResetDate", today, onStorageError);
     }
   }, []);
 
@@ -102,20 +116,20 @@ export const PetProvider = ({children})=>{
 
   // Save counters whenever they change
   useEffect(() => {
-    localStorage.setItem("feedProgressCounter", feedProgressCounter);
-  }, [feedProgressCounter]);
+    safeSetItem("feedProgressCounter", feedProgressCounter, onStorageError);
+  }, [feedProgressCounter, onStorageError]);
 
   useEffect(() => {
-    localStorage.setItem("walkProgressCounter", walkProgressCounter);
-  }, [walkProgressCounter]);
+    safeSetItem("walkProgressCounter", walkProgressCounter, onStorageError);
+  }, [walkProgressCounter, onStorageError]);
 
   useEffect(() => {
-    localStorage.setItem("bathProgressCounter", bathProgressCounter);
-  }, [bathProgressCounter]);
+    safeSetItem("bathProgressCounter", bathProgressCounter, onStorageError);
+  }, [bathProgressCounter, onStorageError]);
 
   useEffect(() => {
-    localStorage.setItem("playProgressCounter", playProgressCounter);
-  }, [playProgressCounter]);
+    safeSetItem("playProgressCounter", playProgressCounter, onStorageError);
+  }, [playProgressCounter, onStorageError]);
 
     const totalWalks = petInfo?.additional?.walk ? Object.values(petInfo.additional.walk).length: 0;
     const totalMeals = petInfo?.additional?.feed ? Object.values(petInfo.additional.feed).length: 0;
@@ -123,7 +137,7 @@ export const PetProvider = ({children})=>{
     const totalPlays = petInfo?.additional?.play ? Object.values(petInfo.additional.play).length: 0;
 
     useEffect(()=>{
-        localStorage.setItem("PetInfo", JSON.stringify(petInfo));
+        safeSetItem("PetInfo", JSON.stringify(petInfo), onStorageError);
     }, [petInfo])
 
 const areSchedulesComplete = (additional) => {
@@ -215,6 +229,16 @@ function isTaskMissed(timeString) {
 }
 
     return (
+    <>
+    {storageWarning && (
+      <div
+        className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-[#1b1a1a] text-white text-[11px] px-4 py-2 z-50 shadow-lg"
+        style={{ fontFamily: 'monospace' }}
+      >
+        ⚠ Could not save data — storage may be full.{' '}
+        <button onClick={() => setStorageWarning(false)} className="underline ml-2 bg-transparent border-none text-white cursor-pointer text-[11px]">dismiss</button>
+      </div>
+    )}
     <PetContext.Provider value={{
         pet,
         setPet,
@@ -246,5 +270,6 @@ function isTaskMissed(timeString) {
         }}>
         {children}
     </PetContext.Provider>
+    </>
 )
 }

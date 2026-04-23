@@ -10,7 +10,7 @@ const PlayTracker = () => {
 
   const handlePlay = () => {
     if (playProgressCounter >= totalPlays) return
-    setPlayProgressCounter(playProgressCounter + 1)
+    setPlayProgressCounter(prev => prev + 1)
     setPetInfo(prev => ({
       ...prev,
       attributes: {
