@@ -93,7 +93,7 @@ export const PetProvider = ({children})=>{
     }
   }, []);
 
-  // Reset daily penalties at the start of each new day
+  // Reset daily penalties and progress counters at the start of each new day
   useEffect(() => {
     const today = new Date().toDateString();
     const lastReset = localStorage.getItem("penaltyResetDate");
@@ -105,6 +105,10 @@ export const PetProvider = ({children})=>{
         penalizedPlay: {},
         penalizedWalk: {},
       }));
+      setWalkProgressCounter(0);
+      setBathProgressCounter(0);
+      setFeedProgressCounter(0);
+      setPlayProgressCounter(0);
       safeSetItem("penaltyResetDate", today, onStorageError);
     }
   }, []);
