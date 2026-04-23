@@ -233,7 +233,6 @@ function isTaskMissed(timeString) {
     {storageWarning && (
       <div
         className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-[#1b1a1a] text-white text-[11px] px-4 py-2 z-50 shadow-lg"
-        style={{ fontFamily: 'monospace' }}
       >
         ⚠ Could not save data — storage may be full.{' '}
         <button onClick={() => setStorageWarning(false)} className="underline ml-2 bg-transparent border-none text-white cursor-pointer text-[11px]">dismiss</button>

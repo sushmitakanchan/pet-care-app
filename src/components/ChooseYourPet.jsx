@@ -26,7 +26,7 @@ const ChooseYourPet = () => {
             <img src={cat} alt="cat" onClick={() => { setPet("cat"); setError('') }} className='w-[120px] h-[120px] hover:border border-black hover:shadow-[2px_6px_2px_#b91c1c] active:translate-y-1 active:shadow-[0_2px_0_#b91c1c]' />
           </div>
           {error && <p className="text-white text-[12px] mt-2 font-bold">{error}</p>}
-          <button className="bg-[#FFC832] w-[60px] h-[30px] shadow-[2px_6px_2px_#b91c1c] active:translate-y-1 active:shadow-[0_3px_0_#b91c1c] mt-[30px]" onClick={handleNext}>Next</button>
+          <button className="bg-[#FFC832] shadow-[2px_6px_2px_#b91c1c] active:translate-y-1 active:shadow-[0_3px_0_#b91c1c] mt-[30px] px-[24px] py-[12px]" onClick={handleNext}>Next</button>
         </div>
       </div>
     </div>

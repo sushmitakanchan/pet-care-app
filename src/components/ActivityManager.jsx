@@ -96,6 +96,15 @@ const ActivityManager = ({ type, label }) => {
 
   return (
     <div className='h-[30rem] w-[40rem] mt-[25rem]'>
+      <div className="flex ml-[4rem] mb-[4px]">
+        <span className="w-[20rem]" />
+        <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-wide opacity-60">
+          <label className="w-[2ch] text-center">HH</label>
+          <span>:</span>
+          <label className="w-[2ch] text-center">MM</label>
+          <label className="w-[7ch] text-center">AM/PM</label>
+        </div>
+      </div>
       <div className="space-y-[1rem]">
         {entries.map((entry, index) => (
           <div key={entry.id} className="flex flex-col ml-[4rem]">
