@@ -1,7 +1,8 @@
 // src/components/BarIndicator.jsx
 import React from "react";
 
-const BarIndicator = ({ label, value, icon }) => {
+const BarIndicator = ({ label, value, icon, pet }) => {
+  const p = pet === 'cat' ? 'cat' : 'dog'
    const isHunger = label.toLowerCase().includes("hunger");
   const isEnergy = label.toLowerCase().includes("energy");
   const isHappiness = label.toLowerCase().includes("happiness");
@@ -23,24 +24,23 @@ if (isHunger) {
 
   const getWarningMessage = () => {
     if (isHunger) {
-      if (value > 70 && value < 100) return "Your dog is very hungry!";
+      if (value > 70 && value < 100) return `Your ${p} is very hungry!`;
       if (value >= 100) return "Hunger maxed out, feed immediately!";
     } else {
       if (value < 20) {
-        if (isEnergy) return "Low energy, let your dog rest!";
-        if (isHappiness) return "Your dog feels sad, play with it!";
-        if (isHygiene) return "Dog is dirty, give it a bath!";
+        if (isEnergy) return `Low energy, let your ${p} rest!`;
+        if (isHappiness) return `Your ${p} feels sad, play with it!`;
+        if (isHygiene) return `${p === 'cat' ? 'Cat' : 'Dog'} is dirty, give it a bath!`;
       }
     }
     return null;
   };
 
-  // Positive/healthy state messages
   const getPositiveMessage = () => {
-    if (isHunger && value <= 70) return "Your dog is full and happy!";
-    if (isEnergy && value >= 20) return "Your dog is active!";
-    if (isHappiness && value >= 20) return "Your dog is happy!";
-    if (isHygiene && value >= 20) return "Dog is clean!";
+    if (isHunger && value <= 70) return `Your ${p} is full and happy!`;
+    if (isEnergy && value >= 20) return `Your ${p} is active!`;
+    if (isHappiness && value >= 20) return `Your ${p} is happy!`;
+    if (isHygiene && value >= 20) return `${p === 'cat' ? 'Cat' : 'Dog'} is clean!`;
     return null;
   };
 

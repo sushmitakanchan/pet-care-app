@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useContext } from 'react'
 import "./index.css";
-import { PetProvider } from './context/PetContext';
+import { PetContext, PetProvider } from './context/PetContext';
 import ChooseYourPet from './components/ChooseYourPet'
 import PetCareZone from './components/PetCareZone';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import WalkTracker from './components/WalkTracker';
 import BathTracker from './components/BathTracker';
 import FeedTracker from './components/FeedTracker';
@@ -16,27 +16,32 @@ import FeedSchedule from './components/FeedSchedule';
 import PlaySchedule from './components/PlaySchedule';
 import PetAttributeBars from './components/PetAttributesBars';
 
-function App() {
-  
+const ProtectedRoute = ({ children, requireName = false }) => {
+  const { pet, petInfo } = useContext(PetContext);
+  if (!pet) return <Navigate to="/" replace />;
+  if (requireName && !petInfo?.basic?.name) return <Navigate to="/basic-info" replace />;
+  return children;
+};
 
+function App() {
   return (
-   <PetProvider>
-    <Router>
-      <Routes>
-      <Route path='/' element={<ChooseYourPet/>}/>
-      <Route path='/basic-info' element={<BasicInfo/>}/>
-      <Route path='/additional-info' element={<AdditionalInfo/>}/>
-      <Route path='/pet-care-zone' element={<PetCareZone/>}/>
-      <Route path='/pet-walk' element={<WalkTracker/>}/>
-      <Route path='/pet-bath' element={<BathTracker/>}/>
-      <Route path='/pet-feed' element={<FeedTracker/>}/>
-      <Route path='/pet-play' element={<PlayTracker/>}/>
-      <Route path='/walk-schedule' element={<WalkSchedule/>}/>
-      <Route path='/bath-schedule' element={<BathSchedule/>}/>
-      <Route path='/feed-schedule' element={<FeedSchedule/>}/>
-      <Route path='/play-schedule' element={<PlaySchedule/>}/>
-      <Route path='/pet-care-zone/pet-moods' element={<PetAttributeBars/>}/>
-      </Routes>
+    <PetProvider>
+      <Router>
+        <Routes>
+          <Route path='/' element={<ChooseYourPet />} />
+          <Route path='/basic-info' element={<ProtectedRoute><BasicInfo /></ProtectedRoute>} />
+          <Route path='/additional-info' element={<ProtectedRoute requireName><AdditionalInfo /></ProtectedRoute>} />
+          <Route path='/pet-care-zone' element={<ProtectedRoute requireName><PetCareZone /></ProtectedRoute>} />
+          <Route path='/pet-walk' element={<ProtectedRoute requireName><WalkTracker /></ProtectedRoute>} />
+          <Route path='/pet-bath' element={<ProtectedRoute requireName><BathTracker /></ProtectedRoute>} />
+          <Route path='/pet-feed' element={<ProtectedRoute requireName><FeedTracker /></ProtectedRoute>} />
+          <Route path='/pet-play' element={<ProtectedRoute requireName><PlayTracker /></ProtectedRoute>} />
+          <Route path='/walk-schedule' element={<ProtectedRoute requireName><WalkSchedule /></ProtectedRoute>} />
+          <Route path='/bath-schedule' element={<ProtectedRoute requireName><BathSchedule /></ProtectedRoute>} />
+          <Route path='/feed-schedule' element={<ProtectedRoute requireName><FeedSchedule /></ProtectedRoute>} />
+          <Route path='/play-schedule' element={<ProtectedRoute requireName><PlaySchedule /></ProtectedRoute>} />
+          <Route path='/pet-care-zone/pet-moods' element={<ProtectedRoute requireName><PetAttributeBars /></ProtectedRoute>} />
+        </Routes>
       </Router>
     </PetProvider>
   )
