@@ -14,8 +14,8 @@ const ActivityTracker = ({ bgColor, image, imageClass, onDone }) => {
   const name = petInfo?.basic?.name || 'your pet'
 
   return (
-    <div className='bg-[#1b1a1a] h-screen w-screen m-0 p-0 flex justify-center items-center'>
-      <div className={`relative ${bgColor} h-[40rem] w-[50rem] grid grid-cols-2 grid-rows-6 gap-[10px] p-[10px] place-items-center`}>
+    <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
+      <div className={`relative ${bgColor} w-[90vw] max-w-[50rem] min-h-[80vh] my-4 grid grid-cols-2 grid-rows-6 gap-[10px] p-[10px] place-items-center`}>
         <div className='flex flex-col items-center mt-[20px]'>
           <div role="progressbar" aria-label="Walk progress" aria-valuenow={totalWalks > 0 ? Math.round((walkProgressCounter / totalWalks) * 100) : 0} aria-valuemin={0} aria-valuemax={100} className='relative border border-black w-[20rem] h-[3rem] overflow-hidden'>
             {walkProgressCounter > 0 && (

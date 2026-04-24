@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import dog from '../assets/dog.png';
 import cat from '../assets/cat2.png';
 import { PetContext } from "../context/PetContext";
@@ -11,9 +12,16 @@ const PetCareZone = () => {
   const name = petInfo?.basic?.name || 'your pet'
 
   return (
-    <div className='bg-[#1b1a1a] h-screen w-screen m-0 p-0 flex justify-center items-center'>
-      <div className='relative bg-[#FFC832] h-[40rem] w-[50rem] grid grid-cols-2 grid-rows-6 gap-[10px] p-[10px] place-items-center'>
-        <div className='flex flex-col items-center mt-[20px]'>
+    <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
+      <div className='relative bg-[#FFC832] w-[90vw] max-w-[50rem] min-h-[80vh] my-4 grid grid-cols-2 grid-rows-6 gap-[10px] p-[10px] place-items-center'>
+        <button
+          onClick={() => navigate('/additional-info')}
+          aria-label="Back to additional info"
+          className="absolute top-8 left-8 bg-[#FFC832] w-[40px] h-[40px] flex items-center justify-center shadow-[3px_4px_0px_#4b2d8f] active:translate-y-1 active:shadow-[0_2px_0_#4b2d8f] border-none cursor-pointer z-10"
+        >
+          <ArrowLeft size={25} strokeWidth={4} className="text-black" />
+        </button>
+        <div className='flex flex-col items-center mt-[6rem]'>
           <div role="progressbar" aria-label="Walk progress" aria-valuenow={totalWalks > 0 ? Math.round((walkProgressCounter / totalWalks) * 100) : 0} aria-valuemin={0} aria-valuemax={100} className='relative border border-black w-[20rem] h-[3rem] overflow-hidden'>
             {walkProgressCounter > 0 && (
               <div className="absolute left-0 top-0 h-full bg-[#64D264] transition-all duration-500 p-[10px] text-[10px] items-center text-[#FFFFFF]"
@@ -25,7 +33,7 @@ const PetCareZone = () => {
           <p className="mt-2 text-black text-[10px]">{walkLabel ? walkLabel : `Take ${name} for a walk!`}</p>
         </div>
 
-        <div className='flex flex-col items-center mt-[20px]'>
+        <div className='flex flex-col items-center mt-[6rem]'>
           <div role="progressbar" aria-label="Bath progress" aria-valuenow={totalBaths > 0 ? Math.round((bathProgressCounter / totalBaths) * 100) : 0} aria-valuemin={0} aria-valuemax={100} className='relative border border-black w-[20rem] h-[3rem] overflow-hidden'>
             {bathProgressCounter > 0 && (
               <div className="absolute left-0 top-0 h-full bg-[#0678f1] transition-all duration-500 p-[10px] text-[10px] items-center text-[#FFFFFF]"

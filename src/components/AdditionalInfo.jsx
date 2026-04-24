@@ -35,8 +35,8 @@ const AdditionalInfo = () => {
   };
 
   return (
-    <div className='bg-[#1b1a1a] h-screen w-screen m-0 p-0 flex justify-center items-center'>
-      <div className='relative bg-[#FF3232] h-[40rem] w-[50rem] mt-[3rem] mb-[3rem]'>
+    <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
+      <div className='relative bg-[#FF3232] w-[90vw] max-w-[50rem] min-h-[80vh] my-4'>
         <h2 className='ml-[14rem] mt-[2rem]'>Additional Info</h2>
         <p className='text-[10px] p-[10px] mx-[3rem]'>Please provide this information so we can send you fair reminders and provide valuable advice on how to take care of your pet for maximum benefit and health.</p>
 

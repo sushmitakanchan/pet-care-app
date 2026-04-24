@@ -45,8 +45,8 @@ const BasicInfo = () => {
   const inputClass = 'w-[25rem] p-[10px] mb-[4px] bg-transparent text-black text-[10px] font-bold placeholder-[#000000] border-0 border-b-1 focus:border-b-2 focus:border-[#000000] outline-none'
 
   return (
-    <div className='bg-[#1b1a1a] h-screen w-screen m-0 p-0 flex justify-center items-center'>
-      <div className='relative bg-[#FF3232] h-[40rem] w-[50rem] mt-[3rem] mb-[3rem]'>
+    <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
+      <div className='relative bg-[#FF3232] w-[90vw] max-w-[50rem] min-h-[80vh] my-4'>
         <form aria-label="Basic pet information" className='flex flex-col items-center justify-center mt-[0.5rem]'>
           <img src={pet === 'cat' ? cat : dog} className='size-[8rem]' alt={pet} />
           <h1 className='text-[20px] mt-[1rem]'>BASIC INFO</h1>

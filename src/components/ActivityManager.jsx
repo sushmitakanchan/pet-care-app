@@ -51,6 +51,15 @@ const ActivityManager = ({ type, label }) => {
   };
 
   const handleDelete = (id) => {
+    if (entries.length === 1) {
+      setEntries([{ id: 1, hours: '', minutes: '', ampm: '', error: null }]);
+      setNextId(2);
+      setPetInfo(prev => ({
+        ...prev,
+        additional: { ...prev.additional, [type]: {} },
+      }));
+      return;
+    }
     setEntries(prev => prev.filter(e => e.id !== id));
     setPetInfo(prev => {
       const updated = { ...prev.additional?.[type] };
@@ -95,9 +104,10 @@ const ActivityManager = ({ type, label }) => {
   };
 
   return (
-    <div className='h-[30rem] w-[40rem] mt-[25rem]'>
-      <div className="flex ml-[4rem] mb-[4px]">
-        <span className="w-[20rem]" />
+    <div className='w-full mt-6 sm:h-[30rem] sm:w-[40rem] sm:mt-[25rem]'>
+      {/* Column headers */}
+      <div className="flex mb-[4px] sm:ml-[4rem]">
+        <span className="w-32 shrink-0 sm:w-[20rem]" />
         <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-wide opacity-60">
           <label className="w-[2ch] text-center">HH</label>
           <span>:</span>
@@ -105,11 +115,13 @@ const ActivityManager = ({ type, label }) => {
           <label className="w-[7ch] text-center">AM/PM</label>
         </div>
       </div>
+
+      {/* Entries */}
       <div className="space-y-[1rem]">
         {entries.map((entry, index) => (
-          <div key={entry.id} className="flex flex-col ml-[4rem]">
+          <div key={entry.id} className="flex flex-col sm:ml-[4rem]">
             <div className="flex items-center">
-              <span className="w-[20rem] font-medium">
+              <span className="w-32 shrink-0 font-medium text-[10px] sm:w-[20rem]">
                 {getOrdinal(index + 1)} {label}
               </span>
               <div className='flex items-center gap-2'>
@@ -119,16 +131,16 @@ const ActivityManager = ({ type, label }) => {
                   placeholder='00'
                   value={entry.hours}
                   onChange={(e) => handleTimeChange(entry.id, 'hours', e.target.value)}
-                  className="bg-transparent border-none outline-none text-center placeholder-[#040404] w-[2ch]"
+                  className="bg-transparent border-none outline-none text-center placeholder-[#040404] w-[2ch] text-[10px]"
                 />
-                <span>:</span>
+                <span className="text-[10px]">:</span>
                 <input
                   type="text"
                   maxLength={2}
                   placeholder='00'
                   value={entry.minutes}
                   onChange={(e) => handleTimeChange(entry.id, 'minutes', e.target.value)}
-                  className="bg-transparent border-none outline-none text-center placeholder-[#040404] w-[2ch]"
+                  className="bg-transparent border-none outline-none text-center placeholder-[#040404] w-[2ch] text-[10px]"
                 />
                 <input
                   type="text"
@@ -136,40 +148,40 @@ const ActivityManager = ({ type, label }) => {
                   placeholder="am/pm"
                   value={entry.ampm}
                   onChange={(e) => handleTimeChange(entry.id, 'ampm', e.target.value)}
-                  className="bg-transparent border-none outline-none text-center uppercase placeholder-[#040404] w-[7ch]"
+                  className="bg-transparent border-none outline-none text-center uppercase placeholder-[#040404] w-[7ch] text-[10px]"
                 />
-                {entries.length > 1 && (
-                  <button
-                    onClick={() => handleDelete(entry.id)}
-                    aria-label="Delete entry"
-                    className="bg-[#8d8b91] w-[28px] h-[24px] text-white text-[11px] font-extrabold shadow-[2px_4px_0px_#4b4950] active:translate-y-1 active:shadow-[0_2px_0_#4b4950] border-none cursor-pointer"
-                  >
-                    ✕
-                  </button>
-                )}
+                <button
+                  onClick={() => handleDelete(entry.id)}
+                  aria-label="Delete entry"
+                  className="bg-[#8d8b91] w-[28px] h-[24px] text-white text-[11px] font-extrabold shadow-[2px_4px_0px_#4b4950] active:translate-y-1 active:shadow-[0_2px_0_#4b4950] border-none cursor-pointer"
+                >
+                  ✕
+                </button>
               </div>
             </div>
             {entry.error && (
-              <p role="alert" className="text-red-600 text-[9px] ml-[20rem] mt-[2px]">{entry.error}</p>
+              <p role="alert" className="text-red-600 text-[9px] mt-[2px] sm:ml-[20rem]">{entry.error}</p>
             )}
           </div>
         ))}
       </div>
 
-      <button
-        onClick={handleAdd}
-        aria-label={`Add another ${label}`}
-        className="bg-transparent border-none ml-[30rem] mt-[2rem]"
-      >
-        <Plus className='size-[2rem]' />
-      </button>
-
-      <button
-        className="bg-[#FFC832] w-[80px] h-[40px] shadow-[2px_6px_2px_#b91c1c] active:translate-y-1 active:shadow-[0_3px_0_#b91c1c] mt-[30px] ml-[15rem]"
-        onClick={handleOk}
-      >
-        OK
-      </button>
+      {/* Add + OK — + above OK on desktop, row on mobile */}
+      <div className="flex justify-between items-center mt-8 sm:flex sm:flex-col sm:items-start">
+        <button
+          onClick={handleAdd}
+          aria-label={`Add another ${label}`}
+          className="bg-transparent border-none sm:ml-[30rem]"
+        >
+          <Plus className='size-[2rem]' />
+        </button>
+        <button
+          className="bg-[#FFC832] w-[80px] h-[40px] shadow-[2px_6px_2px_#b91c1c] active:translate-y-1 active:shadow-[0_3px_0_#b91c1c] sm:mt-[10px] sm:ml-[15rem]"
+          onClick={handleOk}
+        >
+          OK
+        </button>
+      </div>
     </div>
   );
 };
