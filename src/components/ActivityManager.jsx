@@ -150,7 +150,7 @@ const ActivityManager = ({ type, label }) => {
               </div>
             </div>
             {entry.error && (
-              <p className="text-red-600 text-[9px] ml-[20rem] mt-[2px]">{entry.error}</p>
+              <p role="alert" className="text-red-600 text-[9px] ml-[20rem] mt-[2px]">{entry.error}</p>
             )}
           </div>
         ))}
@@ -158,6 +158,7 @@ const ActivityManager = ({ type, label }) => {
 
       <button
         onClick={handleAdd}
+        aria-label={`Add another ${label}`}
         className="bg-transparent border-none ml-[30rem] mt-[2rem]"
       >
         <Plus className='size-[2rem]' />

@@ -52,7 +52,7 @@ if (isHunger) {
     <div className="flex flex-col items-center w-full">
       <img src={icon} alt={label} className="w-[9rem] h-[7rem] mb-0" />
       <p className="text-[10px] mt-[0] uppercase tracking-wider text-gray-700">{label}</p>
-      <div className="relative w-[12rem] h-[1.4rem] border border-black bg-gray-300 rounded-lg overflow-hidden shadow">
+      <div role="progressbar" aria-label={label} aria-valuenow={value} aria-valuemin={0} aria-valuemax={100} className="relative w-[12rem] h-[1.4rem] border border-black bg-gray-300 rounded-lg overflow-hidden shadow">
         <div
           className={`h-full ${getBarColor()} transition-all duration-500`}
           style={{ width: value === 0 ? "8px" : `${value}%` }}
