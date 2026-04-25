@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PetContext } from "../context/PetContext";
 import { Check } from 'lucide-react';
@@ -14,22 +14,27 @@ const AdditionalInfo = () => {
   const { petInfo, setSchedulesReady } = useContext(PetContext);
   const navigate = useNavigate();
   const [showToast, setShowToast] = useState(false);
-  const toastShown = useRef(false);
 
   const isDone = (key) => Object.values(petInfo.additional?.[key] || {}).length > 0;
   const allDone = schedules.every(s => isDone(s.key));
 
   useEffect(() => {
-    if (allDone && !toastShown.current) {
-      toastShown.current = true;
-      setShowToast(true);
-      const t = setTimeout(() => setShowToast(false), 3000);
-      return () => clearTimeout(t);
-    }
+    if (!allDone) return;
+    setShowToast(true);
+    const t = setTimeout(() => setShowToast(false), 3000);
+    return () => clearTimeout(t);
   }, [allDone]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!allDone) return;
+    if ('Notification' in window) {
+      if (Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+      if (Notification.permission === 'granted') {
+        new Notification('PetHQ', { body: "You're all set! We'll remind you when it's time to care for your pet." });
+      }
+    }
     setSchedulesReady(true);
     navigate('/pet-care-zone');
   };
@@ -61,6 +66,14 @@ const AdditionalInfo = () => {
           ))}
         </ul>
 
+        {showToast && (
+          <div className='absolute bottom-[5.5rem] left-0 right-0 flex justify-center z-50'>
+            <div className='bg-[#1b1a1a] border-2 border-[#FFC832] shadow-[4px_4px_0_#FFC832] px-6 py-3 text-white text-[12px] font-bold whitespace-nowrap'>
+              All schedules set — onboarding complete!
+            </div>
+          </div>
+        )}
+
         <div className='absolute bottom-6 left-0 right-0 flex gap-[20px] justify-center items-center'>
           <button className="bg-[#8d8b91] w-[90px] h-[50px] shadow-[2px_6px_2px_#b91c1c] active:translate-y-1 active:shadow-[0_3px_0_#b91c1c]" onClick={() => navigate('/basic-info')}>BACK</button>
           <button
@@ -73,12 +86,6 @@ const AdditionalInfo = () => {
           </button>
         </div>
       </div>
-
-      {showToast && (
-        <div className='fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-[#1b1a1a] border-2 border-[#FFC832] shadow-[4px_4px_0_#FFC832] px-6 py-4 text-white text-[12px] font-bold whitespace-nowrap'>
-          All schedules set — onboarding complete!
-        </div>
-      )}
     </div>
   );
 };

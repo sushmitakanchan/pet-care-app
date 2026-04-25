@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useCallback } from "react";
 import { usePetAttributes } from "../hooks/usePetAttributes";
+import { useNotifications } from "../hooks/useNotifications";
 
 export const PetContext = createContext();
 
@@ -15,6 +16,13 @@ const safeSetItem = (key, value, onError) => {
 export const PetProvider = ({children})=>{
   const [storageWarning, setStorageWarning] = useState(false);
   const onStorageError = useCallback(() => setStorageWarning(true), []);
+
+  const [toasts, setToasts] = useState([]);
+  const addToast = useCallback((message) => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500);
+  }, []);
     const [schedulesReady, setSchedulesReady] = useState(() => {
         return sessionStorage.getItem("schedulesReady") === "true";
     });
@@ -146,9 +154,19 @@ export const PetProvider = ({children})=>{
     }, [petInfo])
 
   usePetAttributes(setPetInfo, schedulesReady);
+  useNotifications(petInfo, schedulesReady, addToast);
 
     return (
     <>
+    {toasts.length > 0 && (
+      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center">
+        {toasts.map(toast => (
+          <div key={toast.id} className="bg-[#1b1a1a] border-2 border-[#FFC832] shadow-[4px_4px_0_#FFC832] px-6 py-4 text-white text-[12px] font-bold whitespace-nowrap">
+            🐾 {toast.message}
+          </div>
+        ))}
+      </div>
+    )}
     {storageWarning && (
       <div
         className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-[#1b1a1a] text-white text-[11px] px-4 py-2 z-50 shadow-lg"
