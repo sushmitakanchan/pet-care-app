@@ -33,7 +33,7 @@ const WalkTracker = () => {
     }
   }, [walkProgressCounter, petInfo, setWalkLabel])
 
-  return <ActivityTracker bgColor="bg-[#64D264]" image={walkImage} imageClass="mt-[5rem] size-[12rem]" onDone={handleWalk} />
+  return <ActivityTracker bgColor="bg-[#64D264]" darkBgColor="dark:bg-[#1a3d1a]" image={walkImage} imageClass="mt-[5rem] size-[12rem]" onDone={handleWalk} />
 }
 
 export default WalkTracker

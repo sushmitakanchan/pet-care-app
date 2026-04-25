@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useCallback } from "react";
+import { Moon, Sun } from "lucide-react";
 import { usePetAttributes } from "../hooks/usePetAttributes";
 import { useNotifications } from "../hooks/useNotifications";
 
@@ -16,6 +17,18 @@ const safeSetItem = (key, value, onError) => {
 export const PetProvider = ({children})=>{
   const [storageWarning, setStorageWarning] = useState(false);
   const onStorageError = useCallback(() => setStorageWarning(true), []);
+
+  const [isDark, setIsDark] = useState(() => localStorage.getItem('darkMode') === 'true');
+  const toggleDark = useCallback(() => {
+    setIsDark(prev => {
+      const next = !prev;
+      localStorage.setItem('darkMode', String(next));
+      return next;
+    });
+  }, []);
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark);
+  }, [isDark]);
 
   const [toasts, setToasts] = useState([]);
   const addToast = useCallback((message) => {
@@ -158,6 +171,13 @@ export const PetProvider = ({children})=>{
 
     return (
     <>
+    <button
+      onClick={toggleDark}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      className="fixed top-3 right-3 z-[100] bg-[#FFC832] w-[36px] h-[36px] flex items-center justify-center shadow-[2px_4px_0_#b91c1c] active:translate-y-1 active:shadow-[0_2px_0_#b91c1c]"
+    >
+      {isDark ? <Sun size={16} className="text-black" /> : <Moon size={16} className="text-black" />}
+    </button>
     {toasts.length > 0 && (
       <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center">
         {toasts.map(toast => (

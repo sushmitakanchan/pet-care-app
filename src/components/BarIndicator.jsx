@@ -1,25 +1,24 @@
-// src/components/BarIndicator.jsx
 import React from "react";
 
 const BarIndicator = ({ label, value, icon, pet }) => {
   const p = pet === 'cat' ? 'cat' : 'dog'
-   const isHunger = label.toLowerCase().includes("hunger");
+  const isHunger = label.toLowerCase().includes("hunger");
   const isEnergy = label.toLowerCase().includes("energy");
   const isHappiness = label.toLowerCase().includes("happiness");
   const isHygiene = label.toLowerCase().includes("hygiene");
 
   const getBarColor = () => {
-if (isHunger) {
-    if (value >= 100) return "bg-[#E53935] animate-pulse"; // maxed out (alert)
-    if (value <= 10) return "bg-[#E53935]"; // show red for very low values (≤10)
-    if (value > 50) return "bg-[#22C55E]";
-    return "bg-[#48BB78]";
-  } else {
-    if (value <= 10) return "bg-[#E53935]";
-    if (value > 70) return "bg-[#22C55E]";
-    if (value > 40) return "bg-[#F6E05E]";
-    return "bg-[#F6E05E]";
-  }
+    if (isHunger) {
+      if (value >= 100) return "bg-[#E53935] animate-pulse";
+      if (value <= 10) return "bg-[#E53935]";
+      if (value > 50) return "bg-[#22C55E]";
+      return "bg-[#48BB78]";
+    } else {
+      if (value <= 10) return "bg-[#E53935]";
+      if (value > 70) return "bg-[#22C55E]";
+      if (value > 40) return "bg-[#F6E05E]";
+      return "bg-[#F6E05E]";
+    }
   };
 
   const getWarningMessage = () => {
@@ -48,11 +47,10 @@ if (isHunger) {
   const positive = getPositiveMessage();
 
   return (
-    
     <div className="flex flex-col items-center w-full">
       <img src={icon} alt={label} className="w-[9rem] h-[7rem] mb-0" />
-      <p className="text-[10px] mt-[0] uppercase tracking-wider text-gray-700">{label}</p>
-      <div role="progressbar" aria-label={label} aria-valuenow={value} aria-valuemin={0} aria-valuemax={100} className="relative w-[12rem] h-[1.4rem] border border-black bg-gray-300 rounded-lg overflow-hidden shadow">
+      <p className="text-[10px] mt-[0] uppercase tracking-wider text-gray-700 dark:text-gray-300">{label}</p>
+      <div role="progressbar" aria-label={label} aria-valuenow={value} aria-valuemin={0} aria-valuemax={100} className="relative w-[12rem] h-[1.4rem] border border-black dark:border-gray-600 bg-gray-300 dark:bg-gray-600 rounded-lg overflow-hidden shadow">
         <div
           className={`h-full ${getBarColor()} transition-all duration-500`}
           style={{ width: value === 0 ? "8px" : `${value}%` }}
@@ -61,7 +59,6 @@ if (isHunger) {
           {value}%
         </span>
       </div>
-      {/* Message - warning or positive */}
       {warning ? (
         <p className="text-[8px] text-[#EF4444] mt-1">{warning}</p>
       ) : (
@@ -70,6 +67,5 @@ if (isHunger) {
     </div>
   );
 };
-
 
 export default BarIndicator;

@@ -33,7 +33,7 @@ const PlayTracker = () => {
     }
   }, [playProgressCounter, petInfo, setPlayLabel])
 
-  return <ActivityTracker bgColor="bg-[#E13296]" image={playImage} imageClass="mt-[5rem] h-[15rem] w-[20rem]" onDone={handlePlay} />
+  return <ActivityTracker bgColor="bg-[#E13296]" darkBgColor="dark:bg-[#4d0a30]" image={playImage} imageClass="mt-[5rem] h-[15rem] w-[20rem]" onDone={handlePlay} />
 }
 
 export default PlayTracker

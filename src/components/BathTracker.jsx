@@ -32,7 +32,7 @@ const BathTracker = () => {
     }
   }, [bathProgressCounter, petInfo, setBathLabel])
 
-  return <ActivityTracker bgColor="bg-[#3296FF]" image={bathImage} imageClass="mt-[2rem] size-[12rem]" onDone={handleBath} />
+  return <ActivityTracker bgColor="bg-[#3296FF]" darkBgColor="dark:bg-[#0a2050]" image={bathImage} imageClass="mt-[2rem] size-[12rem]" onDone={handleBath} />
 }
 
 export default BathTracker

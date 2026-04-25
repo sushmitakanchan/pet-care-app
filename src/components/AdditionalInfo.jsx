@@ -41,9 +41,9 @@ const AdditionalInfo = () => {
 
   return (
     <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
-      <div className='relative bg-[#FF3232] w-[90vw] max-w-[50rem] min-h-[80vh] my-4'>
-        <h2 className='ml-[14rem] mt-[2rem]'>Additional Info</h2>
-        <p className='text-[10px] p-[10px] mx-[3rem]'>Please provide this information so we can send you fair reminders and provide valuable advice on how to take care of your pet for maximum benefit and health.</p>
+      <div className='relative bg-[#FF3232] dark:bg-[#2d0808] w-[90vw] max-w-[50rem] min-h-[80vh] my-4'>
+        <h2 className='ml-[14rem] mt-[2rem] dark:text-white'>Additional Info</h2>
+        <p className='text-[10px] p-[10px] mx-[3rem] dark:text-white'>Please provide this information so we can send you fair reminders and provide valuable advice on how to take care of your pet for maximum benefit and health.</p>
 
         <ul className='flex flex-col gap-[30px] text-[15px] mt-[2rem] mx-[2.5rem]' role="list">
           {schedules.map(({ key, label, route, aria }) => (
@@ -57,11 +57,11 @@ const AdditionalInfo = () => {
               className='flex items-center gap-6 cursor-pointer'
             >
               <div
-                className={`w-11 h-11 rounded-full border-[3px] border-black shrink-0 flex items-center justify-center ${isDone(key) ? 'bg-[#FFC832]' : 'bg-transparent'}`}
+                className={`w-11 h-11 rounded-full border-[3px] border-black dark:border-gray-400 shrink-0 flex items-center justify-center ${isDone(key) ? 'bg-[#FFC832]' : 'bg-transparent'}`}
               >
                 {isDone(key) && <Check size={20} strokeWidth={4} className='text-black' />}
               </div>
-              <span>{label(petInfo.basic.name)}</span>
+              <span className='dark:text-white'>{label(petInfo.basic.name)}</span>
             </li>
           ))}
         </ul>

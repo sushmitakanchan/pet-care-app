@@ -33,7 +33,7 @@ const FeedTracker = () => {
     }
   }, [feedProgressCounter, petInfo, setFeedLabel])
 
-  return <ActivityTracker bgColor="bg-[#9664E1]" image={feedImage} imageClass="mt-[2rem] size-[12rem]" onDone={handleFeed} />
+  return <ActivityTracker bgColor="bg-[#9664E1]" darkBgColor="dark:bg-[#2d1a50]" image={feedImage} imageClass="mt-[2rem] size-[12rem]" onDone={handleFeed} />
 }
 
 export default FeedTracker

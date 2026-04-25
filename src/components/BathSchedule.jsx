@@ -7,7 +7,7 @@ const BathSchedule = () => {
   const navigate = useNavigate()
   return (
     <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
-      <div className='relative bg-[#3296FF] w-[90vw] min-h-[500px] my-4 flex flex-col px-4 py-6 sm:min-h-0 sm:my-0 sm:h-[40rem] sm:w-[50rem] sm:grid sm:grid-cols-2 sm:grid-rows-6 sm:gap-[10px] sm:p-[10px] sm:place-items-center'>
+      <div className='relative bg-[#3296FF] dark:bg-[#0a2050] w-[90vw] min-h-[500px] my-4 flex flex-col px-4 py-6 sm:min-h-0 sm:my-0 sm:h-[40rem] sm:w-[50rem] sm:grid sm:grid-cols-2 sm:grid-rows-6 sm:gap-[10px] sm:p-[10px] sm:place-items-center'>
         <button
           onClick={() => navigate('/additional-info')}
           aria-label="Back to additional info"
@@ -15,7 +15,7 @@ const BathSchedule = () => {
         >
           <ArrowLeft size={25} strokeWidth={4} className="text-black" />
         </button>
-        <h3 className='text-center mb-4 mt-20 sm:ml-[25rem] sm:mb-0'>BATH</h3>
+        <h3 className='text-center mb-4 mt-20 sm:ml-[25rem] sm:mb-0 dark:text-white'>BATH</h3>
         <div className='w-full sm:w-auto sm:mt-[15rem] sm:mr-[20rem]'>
           <ActivityManager type="bath" label="Bath"/>
         </div>

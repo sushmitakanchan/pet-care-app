@@ -7,7 +7,7 @@ const FeedSchedule = () => {
   const navigate = useNavigate()
   return (
     <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
-      <div className='relative bg-[#9664E1] w-[90vw] min-h-[500px] my-4 flex flex-col px-4 py-6 sm:min-h-0 sm:my-0 sm:h-[40rem] sm:w-[50rem] sm:grid sm:grid-cols-2 sm:grid-rows-6 sm:gap-[10px] sm:p-[10px] sm:place-items-center'>
+      <div className='relative bg-[#9664E1] dark:bg-[#2d1a50] w-[90vw] min-h-[500px] my-4 flex flex-col px-4 py-6 sm:min-h-0 sm:my-0 sm:h-[40rem] sm:w-[50rem] sm:grid sm:grid-cols-2 sm:grid-rows-6 sm:gap-[10px] sm:p-[10px] sm:place-items-center'>
         <button
           onClick={() => navigate('/additional-info')}
           aria-label="Back to additional info"
@@ -15,7 +15,7 @@ const FeedSchedule = () => {
         >
           <ArrowLeft size={25} strokeWidth={4} className="text-black" />
         </button>
-        <h3 className='text-center mb-4 mt-20 sm:ml-[25rem] sm:mb-0'>MEALS</h3>
+        <h3 className='text-center mb-4 mt-20 sm:ml-[25rem] sm:mb-0 dark:text-white'>MEALS</h3>
         <div className='w-full sm:w-auto sm:mt-[15rem] sm:mr-[20rem]'>
           <ActivityManager type="feed" label="Meal"/>
         </div>
