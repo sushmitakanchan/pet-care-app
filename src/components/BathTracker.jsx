@@ -5,12 +5,13 @@ import catbath from '../assets/catbath.png'
 import ActivityTracker from './ActivityTracker'
 
 const BathTracker = () => {
-  const { pet, petInfo, setPetInfo, bathProgressCounter, setBathProgressCounter, setBathLabel, totalBaths } = useContext(PetContext)
+  const { pet, petInfo, setPetInfo, bathProgressCounter, setBathProgressCounter, setBathLabel, totalBaths, recordActivity } = useContext(PetContext)
   const bathImage = pet === 'cat' ? catbath : dogbath
 
   const handleBath = () => {
     if (bathProgressCounter >= totalBaths) return
     setBathProgressCounter(prev => prev + 1)
+    recordActivity('bath')
     setPetInfo(prev => ({
       ...prev,
       attributes: {

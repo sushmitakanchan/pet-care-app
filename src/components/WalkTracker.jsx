@@ -5,12 +5,13 @@ import { PetContext } from '../context/PetContext'
 import ActivityTracker from './ActivityTracker'
 
 const WalkTracker = () => {
-  const { pet, petInfo, setPetInfo, walkProgressCounter, setWalkProgressCounter, setWalkLabel, totalWalks } = useContext(PetContext)
+  const { pet, petInfo, setPetInfo, walkProgressCounter, setWalkProgressCounter, setWalkLabel, totalWalks, recordActivity } = useContext(PetContext)
   const walkImage = pet === 'cat' ? catwalk : dogwalk
 
   const handleWalk = () => {
     if (walkProgressCounter >= totalWalks) return
     setWalkProgressCounter(prev => prev + 1)
+    recordActivity('walk')
     setPetInfo(prev => ({
       ...prev,
       attributes: {

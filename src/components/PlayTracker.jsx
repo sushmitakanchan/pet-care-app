@@ -5,12 +5,13 @@ import catplay from '../assets/catplay.png'
 import ActivityTracker from './ActivityTracker'
 
 const PlayTracker = () => {
-  const { pet, petInfo, setPetInfo, playProgressCounter, setPlayProgressCounter, setPlayLabel, totalPlays } = useContext(PetContext)
+  const { pet, petInfo, setPetInfo, playProgressCounter, setPlayProgressCounter, setPlayLabel, totalPlays, recordActivity } = useContext(PetContext)
   const playImage = pet === 'cat' ? catplay : dogplay
 
   const handlePlay = () => {
     if (playProgressCounter >= totalPlays) return
     setPlayProgressCounter(prev => prev + 1)
+    recordActivity('play')
     setPetInfo(prev => ({
       ...prev,
       attributes: {

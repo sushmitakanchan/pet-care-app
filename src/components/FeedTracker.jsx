@@ -5,12 +5,13 @@ import catfeed from '../assets/catfeed.png'
 import ActivityTracker from './ActivityTracker'
 
 const FeedTracker = () => {
-  const { pet, petInfo, setPetInfo, feedProgressCounter, setFeedProgressCounter, setFeedLabel, totalMeals } = useContext(PetContext)
+  const { pet, petInfo, setPetInfo, feedProgressCounter, setFeedProgressCounter, setFeedLabel, totalMeals, recordActivity } = useContext(PetContext)
   const feedImage = pet === 'cat' ? catfeed : dogfeed
 
   const handleFeed = () => {
     if (feedProgressCounter >= totalMeals) return
     setFeedProgressCounter(prev => prev + 1)
+    recordActivity('feed')
     setPetInfo(prev => ({
       ...prev,
       attributes: {

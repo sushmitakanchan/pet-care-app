@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, useCallback } from "react";
 import { Moon, Sun } from "lucide-react";
 import { usePetAttributes } from "../hooks/usePetAttributes";
 import { useNotifications } from "../hooks/useNotifications";
+import { useActivityHistory } from "../hooks/useActivityHistory";
 
 export const PetContext = createContext();
 
@@ -36,31 +37,32 @@ export const PetProvider = ({children})=>{
     setToasts(prev => [...prev, { id, message }]);
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500);
   }, []);
-    const [schedulesReady, setSchedulesReady] = useState(() => {
-        return sessionStorage.getItem("schedulesReady") === "true";
-    });
-    const [pet, setPet] = useState(()=>{
-        const stored = localStorage.getItem("SelectedPet");
-        return stored ? stored : "";
-    })
-    const [walkProgressCounter, setWalkProgressCounter] = useState(() => {
+
+  const [schedulesReady, setSchedulesReady] = useState(() => {
+    return sessionStorage.getItem("schedulesReady") === "true";
+  });
+  const [pet, setPet] = useState(()=>{
+    const stored = localStorage.getItem("SelectedPet");
+    return stored ? stored : "";
+  });
+  const [walkProgressCounter, setWalkProgressCounter] = useState(() => {
     return Number(localStorage.getItem("walkProgressCounter")) || 0;
-  })
-    const [walkLabel, setWalkLabel] = useState('')
+  });
+  const [walkLabel, setWalkLabel] = useState('');
 
-    const [bathProgressCounter, setBathProgressCounter] = useState(() => {
+  const [bathProgressCounter, setBathProgressCounter] = useState(() => {
     return Number(localStorage.getItem("bathProgressCounter")) || 0;
-  })
-    const [bathLabel, setBathLabel] = useState('')
-    const [feedProgressCounter, setFeedProgressCounter] = useState(() => {
+  });
+  const [bathLabel, setBathLabel] = useState('');
+  const [feedProgressCounter, setFeedProgressCounter] = useState(() => {
     return Number(localStorage.getItem("feedProgressCounter")) || 0;
-  })
-    const [feedLabel, setFeedLabel] = useState('')
+  });
+  const [feedLabel, setFeedLabel] = useState('');
 
-    const [playProgressCounter, setPlayProgressCounter] = useState(() => {
+  const [playProgressCounter, setPlayProgressCounter] = useState(() => {
     return Number(localStorage.getItem("playProgressCounter")) || 0;
-  })
-    const [playLabel, setPlayLabel] = useState('')
+  });
+  const [playLabel, setPlayLabel] = useState('');
 
   const [petInfo, setPetInfo] = useState(() => {
     try {
@@ -90,6 +92,8 @@ export const PetProvider = ({children})=>{
     penalizedWalk: {},
   };
 
+  const { recordActivity, clearHistory, lastCompleted, streak } = useActivityHistory();
+
   const resetPetInfo = () => {
     localStorage.removeItem("PetInfo");
     localStorage.removeItem("walkProgressCounter");
@@ -104,6 +108,7 @@ export const PetProvider = ({children})=>{
     setBathProgressCounter(0);
     setPlayProgressCounter(0);
     setSchedulesReady(false);
+    clearHistory();
   };
 
   // Reset on new browser session
@@ -157,19 +162,19 @@ export const PetProvider = ({children})=>{
     safeSetItem("playProgressCounter", playProgressCounter, onStorageError);
   }, [playProgressCounter, onStorageError]);
 
-    const totalWalks = petInfo?.additional?.walk ? Object.values(petInfo.additional.walk).length: 0;
-    const totalMeals = petInfo?.additional?.feed ? Object.values(petInfo.additional.feed).length: 0;
-    const totalBaths = petInfo?.additional?.bath ? Object.values(petInfo.additional.bath).length: 0;
-    const totalPlays = petInfo?.additional?.play ? Object.values(petInfo.additional.play).length: 0;
+  const totalWalks = petInfo?.additional?.walk ? Object.values(petInfo.additional.walk).length : 0;
+  const totalMeals = petInfo?.additional?.feed ? Object.values(petInfo.additional.feed).length : 0;
+  const totalBaths = petInfo?.additional?.bath ? Object.values(petInfo.additional.bath).length : 0;
+  const totalPlays = petInfo?.additional?.play ? Object.values(petInfo.additional.play).length : 0;
 
-    useEffect(()=>{
-        safeSetItem("PetInfo", JSON.stringify(petInfo), onStorageError);
-    }, [petInfo])
+  useEffect(()=>{
+    safeSetItem("PetInfo", JSON.stringify(petInfo), onStorageError);
+  }, [petInfo]);
 
   usePetAttributes(setPetInfo, schedulesReady);
   useNotifications(petInfo, schedulesReady, addToast);
 
-    return (
+  return (
     <>
     <button
       onClick={toggleDark}
@@ -188,44 +193,45 @@ export const PetProvider = ({children})=>{
       </div>
     )}
     {storageWarning && (
-      <div
-        className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-[#1b1a1a] text-white text-[11px] px-4 py-2 z-50 shadow-lg"
-      >
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-[#1b1a1a] text-white text-[11px] px-4 py-2 z-50 shadow-lg">
         ⚠ Could not save data — storage may be full.{' '}
         <button onClick={() => setStorageWarning(false)} className="underline ml-2 bg-transparent border-none text-white cursor-pointer text-[11px]">dismiss</button>
       </div>
     )}
     <PetContext.Provider value={{
-        pet,
-        setPet,
-        petInfo,
-        setPetInfo,
-        walkProgressCounter,
-        setWalkProgressCounter,
-        walkLabel,
-        setWalkLabel,
-        totalWalks,
-        bathProgressCounter,
-        setBathProgressCounter,
-        bathLabel,
-        setBathLabel,
-        totalBaths,
-        feedProgressCounter,
-        setFeedProgressCounter,
-        feedLabel,
-        setFeedLabel,
-        totalMeals,
-        playProgressCounter,
-        setPlayProgressCounter,
-        playLabel,
-        setPlayLabel,
-        totalPlays,
-        schedulesReady,
-        setSchedulesReady,
-        resetPetInfo,
-        }}>
-        {children}
+      pet,
+      setPet,
+      petInfo,
+      setPetInfo,
+      walkProgressCounter,
+      setWalkProgressCounter,
+      walkLabel,
+      setWalkLabel,
+      totalWalks,
+      bathProgressCounter,
+      setBathProgressCounter,
+      bathLabel,
+      setBathLabel,
+      totalBaths,
+      feedProgressCounter,
+      setFeedProgressCounter,
+      feedLabel,
+      setFeedLabel,
+      totalMeals,
+      playProgressCounter,
+      setPlayProgressCounter,
+      playLabel,
+      setPlayLabel,
+      totalPlays,
+      schedulesReady,
+      setSchedulesReady,
+      resetPetInfo,
+      recordActivity,
+      lastCompleted,
+      streak,
+    }}>
+      {children}
     </PetContext.Provider>
     </>
-)
-}
+  );
+};
