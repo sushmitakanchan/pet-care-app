@@ -32,10 +32,10 @@ export const PetProvider = ({children})=>{
   }, [isDark]);
 
   const [toasts, setToasts] = useState([]);
-  const addToast = useCallback((message) => {
+  const addToast = useCallback((message, { urgent = false } = {}) => {
     const id = Date.now();
-    setToasts(prev => [...prev, { id, message }]);
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500);
+    setToasts(prev => [...prev, { id, message, urgent }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), urgent ? 5000 : 3500);
   }, []);
 
   const [schedulesReady, setSchedulesReady] = useState(() => {
@@ -186,9 +186,13 @@ export const PetProvider = ({children})=>{
     {toasts.length > 0 && (
       <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center">
         {toasts.map(toast => (
-          <div key={toast.id} className="bg-[#1b1a1a] border-2 border-[#FFC832] shadow-[4px_4px_0_#FFC832] px-6 py-4 text-white text-[12px] font-bold whitespace-nowrap">
-            🐾 {toast.message}
-          </div>
+          toast.urgent
+            ? <div key={toast.id} className="bg-[#FF3232] border-2 border-[#FFC832] shadow-[4px_4px_0_#000] px-6 py-4 text-white text-[12px] font-bold whitespace-nowrap animate-pulse tracking-widest uppercase">
+                {toast.message}
+              </div>
+            : <div key={toast.id} className="bg-[#1b1a1a] border-2 border-[#FFC832] shadow-[4px_4px_0_#FFC832] px-6 py-4 text-white text-[12px] font-bold whitespace-nowrap">
+                🐾 {toast.message}
+              </div>
         ))}
       </div>
     )}
@@ -229,6 +233,7 @@ export const PetProvider = ({children})=>{
       recordActivity,
       lastCompleted,
       streak,
+      addToast,
     }}>
       {children}
     </PetContext.Provider>
