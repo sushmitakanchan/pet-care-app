@@ -2,12 +2,14 @@ import React from 'react'
 import ActivityManager from './ActivityManager'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import ThemeToggle from './ThemeToggle'
 
 const WalkSchedule = () => {
   const navigate = useNavigate()
   return (
     <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
       <div className='relative bg-[#64D264] dark:bg-[#1a3d1a] w-[90vw] min-h-[500px] my-4 flex flex-col px-4 py-6 sm:min-h-0 sm:my-0 sm:h-[40rem] sm:w-[50rem] sm:grid sm:grid-cols-2 sm:grid-rows-6 sm:gap-[10px] sm:p-[10px] sm:place-items-center'>
+        <ThemeToggle />
         <button
           onClick={() => navigate('/additional-info')}
           aria-label="Back to additional info"

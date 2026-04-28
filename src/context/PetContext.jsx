@@ -1,6 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";
-import { Moon, Sun } from "lucide-react";
 import { usePetAttributes } from "../hooks/usePetAttributes";
 import { useNotifications } from "../hooks/useNotifications";
 import { useActivityHistory } from "../hooks/useActivityHistory";
@@ -318,14 +317,6 @@ export const PetProvider = ({ children }) => {
 
   return (
     <>
-      <button
-        onClick={toggleDark}
-        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-        className="fixed top-3 right-3 z-[100] bg-[#FFC832] w-[36px] h-[36px] flex items-center justify-center shadow-[2px_4px_0_#b91c1c] active:translate-y-1 active:shadow-[0_2px_0_#b91c1c]"
-      >
-        {isDark ? <Sun size={16} className="text-black" /> : <Moon size={16} className="text-black" />}
-      </button>
-
       {toasts.length > 0 && (
         <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center">
           {toasts.map((toast) =>
@@ -372,6 +363,8 @@ export const PetProvider = ({ children }) => {
           petInfo,
           setPetInfo,
           petType,
+          isDark,
+          toggleDark,
 
           walkProgressCounter,
           walkLabel,

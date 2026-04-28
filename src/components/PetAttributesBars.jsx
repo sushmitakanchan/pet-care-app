@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import BarIndicator from "./BarIndicator";
 import { formatLastCompleted } from "../hooks/useActivityHistory";
+import ThemeToggle from "./ThemeToggle";
 
 import energetic from '../assets/energetic.png';
 import happiness from '../assets/happiness.png';
@@ -35,6 +36,7 @@ const PetAttributeBars = () => {
   return (
     <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
       <div className='relative bg-[#eaddc3] dark:bg-[#2a2520] w-[90vw] max-w-[50rem] min-h-[80vh] my-4 flex flex-col items-center p-[10px] rounded-lg shadow-lg'>
+        <ThemeToggle />
         <button
           onClick={() => navigate('/pet-care-zone')}
           aria-label="Back to pet care zone"

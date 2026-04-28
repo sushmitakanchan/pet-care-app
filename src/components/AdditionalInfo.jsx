@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PetContext } from "../context/PetContext";
 import { Check } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 const schedules = [
   { key: 'feed', label: (name) => `How many times do you feed ${name}?`, route: '/feed-schedule', aria: 'Set feeding schedule' },
@@ -42,7 +43,8 @@ const AdditionalInfo = () => {
   return (
     <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
       <div className='relative bg-[#FF3232] dark:bg-[#2d0808] w-[90vw] max-w-[50rem] min-h-[80vh] my-4'>
-        <h2 className='ml-[14rem] mt-[2rem] dark:text-white'>Additional Info</h2>
+        <ThemeToggle />
+        <h2 className='mt-[2rem] text-center dark:text-white'>Additional Info</h2>
         <p className='text-[10px] p-[10px] mx-[3rem] dark:text-white'>Please provide this information so we can send you fair reminders and provide valuable advice on how to take care of your pet for maximum benefit and health.</p>
 
         <ul className='flex flex-col gap-[30px] text-[15px] mt-[2rem] mx-[2.5rem]' role="list">

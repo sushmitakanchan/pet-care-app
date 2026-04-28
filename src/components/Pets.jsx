@@ -6,6 +6,7 @@ import dogImg from '../assets/dog.png';
 import catImg from '../assets/cat2.png';
 import logo from '../assets/logo.png';
 import { getOnboardingStatus } from '../lib/profile';
+import ThemeToggle from './ThemeToggle';
 
 const Pets = () => {
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ const Pets = () => {
   return (
     <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
       <div className='relative bg-[#FF3232] dark:bg-[#2d0808] w-[90vw] max-w-[50rem] min-h-[80vh] my-4 flex flex-col items-center justify-start py-10 px-6'>
+        <ThemeToggle />
         <img src={logo} alt="PetHQ" className='w-[110px] h-[90px]' />
         <h1 className='mt-4 text-center text-[20px] font-bold dark:text-white'>Your Pets</h1>
         <p className='mt-2 text-center text-[10px] dark:text-gray-200 opacity-90'>
@@ -133,4 +135,3 @@ const Pets = () => {
 };
 
 export default Pets;
-

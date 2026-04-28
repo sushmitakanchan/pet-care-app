@@ -4,6 +4,7 @@ import cat from '../assets/cat2.png';
 import { PetContext } from "../context/PetContext";
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 const BasicInfo = () => {
   const { petInfo, setPetInfo } = useContext(PetContext)
@@ -54,6 +55,7 @@ const BasicInfo = () => {
   return (
     <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
       <div className='relative bg-[#FF3232] dark:bg-[#2d0808] w-[90vw] max-w-[50rem] min-h-[80vh] my-4'>
+        <ThemeToggle />
         <button
           onClick={() => navigate('/')}
           aria-label="Back to pets"

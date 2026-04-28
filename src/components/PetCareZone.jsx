@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import dog from '../assets/dog.png';
 import cat from '../assets/cat2.png';
 import { PetContext } from "../context/PetContext";
+import ThemeToggle from './ThemeToggle';
 
 const STRUGGLE_MAP = [
   { key: 'hunger',    check: v => v === 0, toast: name => `🍖 ${name} is STARVING — FEED NOW!!` },
@@ -45,13 +46,16 @@ const PetCareZone = () => {
         >
           <ArrowLeft size={25} strokeWidth={4} className="text-black" />
         </button>
-        <button
-          onClick={() => navigate('/')}
-          aria-label="Switch pets"
-          className="absolute top-8 right-8 bg-[#1b1a1a] text-white px-4 h-[40px] flex items-center justify-center shadow-[3px_4px_0px_#000] active:translate-y-1 active:shadow-[0_2px_0_#000] border-none cursor-pointer z-10 text-[10px] font-bold uppercase tracking-widest"
-        >
-          Pets
-        </button>
+        <div className="absolute top-8 right-8 z-10 flex items-center gap-2">
+          <button
+            onClick={() => navigate('/')}
+            aria-label="Switch pets"
+            className="bg-[#1b1a1a] text-white px-4 h-[40px] flex items-center justify-center shadow-[3px_4px_0px_#000] active:translate-y-1 active:shadow-[0_2px_0_#000] border-none cursor-pointer text-[10px] font-bold uppercase tracking-widest"
+          >
+            Pets
+          </button>
+          <ThemeToggle inline className="h-[40px] w-[40px] shadow-[3px_4px_0px_#000] active:shadow-[0_2px_0_#000]" />
+        </div>
 
         <div className='flex flex-col items-center mt-[6rem]'>
           <div role="progressbar" aria-label="Walk progress" aria-valuenow={totalWalks > 0 ? Math.round((walkProgressCounter / totalWalks) * 100) : 0} aria-valuemin={0} aria-valuemax={100} className='relative border border-black dark:border-gray-500 w-[20rem] h-[3rem] overflow-hidden'>
