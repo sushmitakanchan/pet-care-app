@@ -7,7 +7,8 @@ import { PetContext } from "../context/PetContext";
 import ThemeToggle from './ThemeToggle';
 
 const STRUGGLE_MAP = [
-  { key: 'hunger',    check: v => v === 0, toast: name => `🍖 ${name} is STARVING — FEED NOW!!` },
+  // Hunger is modeled as "how hungry" (0 = full, 100 = very hungry).
+  { key: 'hunger',    check: v => v >= 100, toast: name => `🍖 ${name} is STARVING — FEED NOW!!` },
   { key: 'happiness', check: v => v === 0, toast: name => `💔 ${name} is MISERABLE — GO PLAY!!` },
   { key: 'energy',    check: v => v === 0, toast: name => `😴 ${name} is DRAINED — GO WALK!!` },
   { key: 'hygiene',   check: v => v === 0, toast: name => `🚿 ${name} is GROSS — GIVE A BATH!!` },
