@@ -1,10 +1,13 @@
 import { useEffect, useRef } from 'react';
 
-const MESSAGES = {
-  feed: 'Time to feed your pet!',
-  walk: 'Time to take your pet for a walk!',
-  bath: 'Time to bathe your pet!',
-  play: 'Time to play with your pet!',
+const messageFor = (type, name) => {
+  const n = name?.trim();
+  const who = n || 'your pet';
+  if (type === 'feed') return `Time to feed ${who}!`;
+  if (type === 'walk') return `Time to take ${who} for a walk!`;
+  if (type === 'bath') return `Time to bathe ${who}!`;
+  if (type === 'play') return `Time to play with ${who}!`;
+  return null;
 };
 
 function parseScheduledTime(timeStr) {
@@ -31,8 +34,11 @@ export function useNotifications(petInfo, schedulesReady, addToast) {
 
     const now = Date.now();
     const additional = petInfo?.additional || {};
+    const name = petInfo?.basic?.name || '';
 
-    Object.entries(MESSAGES).forEach(([type, message]) => {
+    (['feed', 'walk', 'bath', 'play']).forEach((type) => {
+      const message = messageFor(type, name);
+      if (!message) return;
       Object.values(additional[type] || {}).forEach(timeStr => {
         const target = parseScheduledTime(timeStr);
         if (!target) { console.log('[PetHQ] Could not parse time:', timeStr); return; }

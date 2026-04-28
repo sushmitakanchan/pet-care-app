@@ -23,14 +23,14 @@ const ACTIVITY_LABELS = {
 };
 
 const PetAttributeBars = () => {
-  const { pet, petInfo, lastCompleted, streak } = useContext(PetContext);
+  const { petType, petInfo, lastCompleted, streak } = useContext(PetContext);
   const navigate = useNavigate();
 
-  const icons = pet === 'cat'
+  const icons = petType === 'cat'
     ? { hunger: cathungry, happiness: cathappiness, energy: catexcited, hygiene: cathygiene }
     : { hunger: hungry, happiness: happiness, energy: energetic, hygiene: doghygiene };
 
-  const heading = pet === 'cat' ? 'Level Up Your Cat!' : 'Level Up Your Pup!';
+  const heading = petType === 'cat' ? 'Level Up Your Cat!' : 'Level Up Your Pup!';
 
   return (
     <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
@@ -58,10 +58,10 @@ const PetAttributeBars = () => {
 
         {/* Attribute bars */}
         <div className="grid grid-cols-2 gap-6 p-6 w-full">
-          <BarIndicator label="Hunger" value={petInfo.attributes?.hunger ?? 0} icon={icons.hunger} pet={pet} />
-          <BarIndicator label="Happiness" value={petInfo.attributes?.happiness ?? 0} icon={icons.happiness} pet={pet} />
-          <BarIndicator label="Energy" value={petInfo.attributes?.energy ?? 0} icon={icons.energy} pet={pet} />
-          <BarIndicator label="Hygiene" value={petInfo.attributes?.hygiene ?? 0} icon={icons.hygiene} pet={pet} />
+          <BarIndicator label="Hunger" value={petInfo.attributes?.hunger ?? 0} icon={icons.hunger} pet={petType} />
+          <BarIndicator label="Happiness" value={petInfo.attributes?.happiness ?? 0} icon={icons.happiness} pet={petType} />
+          <BarIndicator label="Energy" value={petInfo.attributes?.energy ?? 0} icon={icons.energy} pet={petType} />
+          <BarIndicator label="Hygiene" value={petInfo.attributes?.hygiene ?? 0} icon={icons.hygiene} pet={petType} />
         </div>
 
         {/* Last activity history */}

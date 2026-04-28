@@ -11,7 +11,7 @@ const schedules = [
 ];
 
 const AdditionalInfo = () => {
-  const { petInfo, setSchedulesReady } = useContext(PetContext);
+  const { petInfo } = useContext(PetContext);
   const navigate = useNavigate();
   const [showToast, setShowToast] = useState(false);
 
@@ -32,10 +32,10 @@ const AdditionalInfo = () => {
         await Notification.requestPermission();
       }
       if (Notification.permission === 'granted') {
-        new Notification('PetHQ', { body: "You're all set! We'll remind you when it's time to care for your pet." });
+        const name = petInfo?.basic?.name?.trim();
+        new Notification('PetHQ', { body: `You're all set! We'll remind you when it's time to care for ${name || 'your pet'}.` });
       }
     }
-    setSchedulesReady(true);
     navigate('/pet-care-zone');
   };
 

@@ -1,7 +1,7 @@
-import { useContext } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 import "./index.css";
 import { PetContext, PetProvider } from './context/PetContext';
-import ChooseYourPet from './components/ChooseYourPet'
+import Pets from './components/Pets'
 import PetCareZone from './components/PetCareZone';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import WalkTracker from './components/WalkTracker';
@@ -16,10 +16,23 @@ import FeedSchedule from './components/FeedSchedule';
 import PlaySchedule from './components/PlaySchedule';
 import PetAttributeBars from './components/PetAttributesBars';
 
+const RedirectWithToast = ({ to, message }) => {
+  const { addToast } = useContext(PetContext);
+  const firedRef = useRef(false);
+  useEffect(() => {
+    if (firedRef.current) return;
+    firedRef.current = true;
+    addToast?.(message);
+  }, [addToast, message]);
+  return <Navigate to={to} replace />;
+};
+
 const ProtectedRoute = ({ children, requireName = false }) => {
-  const { pet, petInfo } = useContext(PetContext);
-  if (!pet) return <Navigate to="/" replace />;
-  if (requireName && !petInfo?.basic?.name) return <Navigate to="/basic-info" replace />;
+  const { activePetId, petInfo } = useContext(PetContext);
+  if (!activePetId) return <Navigate to="/" replace />;
+  if (requireName && !petInfo?.basic?.name) {
+    return <RedirectWithToast to="/basic-info" message="Pet must have a name. Please fill Basic Info first." />;
+  }
   return children;
 };
 
@@ -28,7 +41,7 @@ function App() {
     <PetProvider>
       <Router>
         <Routes>
-          <Route path='/' element={<ChooseYourPet />} />
+          <Route path='/' element={<Pets />} />
           <Route path='/basic-info' element={<ProtectedRoute><BasicInfo /></ProtectedRoute>} />
           <Route path='/additional-info' element={<ProtectedRoute requireName><AdditionalInfo /></ProtectedRoute>} />
           <Route path='/pet-care-zone' element={<ProtectedRoute requireName><PetCareZone /></ProtectedRoute>} />

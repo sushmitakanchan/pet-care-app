@@ -1,21 +1,24 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 
-const STORAGE_KEY = 'activityHistory';
 const TYPES = ['walk', 'feed', 'bath', 'play'];
 const empty = () => ({ walk: [], feed: [], bath: [], play: [] });
 
-const load = () => {
+const load = (storageKey) => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(storageKey);
     if (stored) return JSON.parse(stored);
-  } catch (e) {}
+  } catch {
+    // ignore corrupted storage
+  }
   return empty();
 };
 
-const save = (history) => {
+const save = (storageKey, history) => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-  } catch (e) {}
+    localStorage.setItem(storageKey, JSON.stringify(history));
+  } catch {
+    // ignore storage failures (private mode / full quota)
+  }
 };
 
 const toDateStr = (iso) => new Date(iso).toDateString();
@@ -57,22 +60,23 @@ export const formatLastCompleted = (iso) => {
   return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + timeStr;
 };
 
-export function useActivityHistory() {
-  const [history, setHistory] = useState(load);
+export function useActivityHistory(petId) {
+  const storageKey = useMemo(() => `activityHistory:${petId || 'unknown'}`, [petId]);
+  const [history, setHistory] = useState(() => load(storageKey));
 
   const recordActivity = useCallback((type) => {
     setHistory(prev => {
       const next = { ...prev, [type]: [...(prev[type] || []), new Date().toISOString()] };
-      save(next);
+      save(storageKey, next);
       return next;
     });
-  }, []);
+  }, [storageKey]);
 
   const clearHistory = useCallback(() => {
     const e = empty();
-    save(e);
+    save(storageKey, e);
     setHistory(e);
-  }, []);
+  }, [storageKey]);
 
   const lastCompleted = {};
   for (const type of TYPES) {

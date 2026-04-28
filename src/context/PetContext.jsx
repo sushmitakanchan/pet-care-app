@@ -1,10 +1,19 @@
-import { createContext, useState, useEffect, useCallback } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { usePetAttributes } from "../hooks/usePetAttributes";
 import { useNotifications } from "../hooks/useNotifications";
 import { useActivityHistory } from "../hooks/useActivityHistory";
+import { clamp01_100, emptyDaily, getSlotsForToday, pickSlotToComplete, simulateToNow } from "../lib/petSim";
+import { getOnboardingStatus } from "../lib/profile";
 
 export const PetContext = createContext();
+
+const LS_PETS_BY_ID = "PetHQ.petsById";
+const LS_PET_ORDER = "PetHQ.petOrder";
+const LS_ACTIVE_PET_ID = "PetHQ.activePetId";
+const LS_DARK_MODE = "darkMode";
+const LS_PENALTY_RESET_DATE = "penaltyResetDate";
 
 const safeSetItem = (key, value, onError) => {
   try {
@@ -15,228 +24,378 @@ const safeSetItem = (key, value, onError) => {
   }
 };
 
-export const PetProvider = ({children})=>{
+const safeJsonParse = (value, fallback) => {
+  try {
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const normalizePetInfo = (raw) => {
+  const today = new Date().toDateString();
+  const base = raw && typeof raw === "object" ? raw : {};
+  const daily = base.daily && base.daily.date === today ? base.daily : emptyDaily(today);
+  return {
+    basic: base.basic || { name: "", age: "", sex: "", breed: "", type: "" },
+    additional: base.additional || { feed: {}, play: {}, walk: {}, bath: {} },
+    attributes: base.attributes || { hunger: 70, happiness: 80, energy: 60, hygiene: 90 },
+    attributesLastUpdatedAt: base.attributesLastUpdatedAt || null,
+    daily: {
+      ...emptyDaily(today),
+      ...(daily || {}),
+      date: daily?.date || today,
+      completed: { ...emptyDaily(today).completed, ...(daily?.completed || {}) },
+      missed: { ...emptyDaily(today).missed, ...(daily?.missed || {}) },
+    },
+    // Legacy fields (kept for backwards compatibility with older saved payloads).
+    penalizedFeed: base.penalizedFeed || {},
+    penalizedBath: base.penalizedBath || {},
+    penalizedPlay: base.penalizedPlay || {},
+    penalizedWalk: base.penalizedWalk || {},
+  };
+};
+
+const newPetId = () => `pet_${Date.now()}_${Math.random().toString(16).slice(2, 6)}`;
+
+const createProfile = (type) => {
+  const id = newPetId();
+  const nowIso = new Date().toISOString();
+  const petInfo = normalizePetInfo({
+    basic: { name: "", age: "", sex: "", breed: "", type: type || "" },
+  });
+  return { id, createdAt: nowIso, updatedAt: nowIso, petInfo };
+};
+
+const loadInitialMultiPetState = () => {
+  const petsById = safeJsonParse(localStorage.getItem(LS_PETS_BY_ID), null);
+  const petOrder = safeJsonParse(localStorage.getItem(LS_PET_ORDER), null);
+  const activePetId = localStorage.getItem(LS_ACTIVE_PET_ID);
+
+  if (petsById && typeof petsById === "object" && Array.isArray(petOrder)) {
+    const nextActive = activePetId && petsById[activePetId] ? activePetId : (petOrder[0] || null);
+    return { petsById, petOrder, activePetId: nextActive, migrated: false };
+  }
+
+  // Legacy migration (one-time): old single-profile keys.
+  const legacyStored = localStorage.getItem("PetInfo");
+  if (legacyStored) {
+    const legacyPetInfo = normalizePetInfo(safeJsonParse(legacyStored, null));
+    const legacyType = legacyPetInfo?.basic?.type || localStorage.getItem("SelectedPet") || "";
+    const fixed = normalizePetInfo({ ...legacyPetInfo, basic: { ...(legacyPetInfo.basic || {}), type: legacyType } });
+    const profile = createProfile(legacyType);
+    profile.petInfo = fixed;
+    return {
+      petsById: { [profile.id]: profile },
+      petOrder: [profile.id],
+      activePetId: profile.id,
+      migrated: true,
+    };
+  }
+
+  return { petsById: {}, petOrder: [], activePetId: null, migrated: false };
+};
+
+export const PetProvider = ({ children }) => {
   const [storageWarning, setStorageWarning] = useState(false);
   const onStorageError = useCallback(() => setStorageWarning(true), []);
 
-  const [isDark, setIsDark] = useState(() => localStorage.getItem('darkMode') === 'true');
+  const [isDark, setIsDark] = useState(() => localStorage.getItem(LS_DARK_MODE) === "true");
   const toggleDark = useCallback(() => {
-    setIsDark(prev => {
+    setIsDark((prev) => {
       const next = !prev;
-      localStorage.setItem('darkMode', String(next));
+      safeSetItem(LS_DARK_MODE, String(next), onStorageError);
       return next;
     });
-  }, []);
+  }, [onStorageError]);
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.classList.toggle("dark", isDark);
   }, [isDark]);
 
   const [toasts, setToasts] = useState([]);
   const addToast = useCallback((message, { urgent = false } = {}) => {
     const id = Date.now();
-    setToasts(prev => [...prev, { id, message, urgent }]);
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), urgent ? 5000 : 3500);
+    setToasts((prev) => [...prev, { id, message, urgent }]);
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), urgent ? 5000 : 3500);
   }, []);
 
-  const [schedulesReady, setSchedulesReady] = useState(() => {
-    return sessionStorage.getItem("schedulesReady") === "true";
-  });
-  const [pet, setPet] = useState(()=>{
-    const stored = localStorage.getItem("SelectedPet");
-    return stored ? stored : "";
-  });
-  const [walkProgressCounter, setWalkProgressCounter] = useState(() => {
-    return Number(localStorage.getItem("walkProgressCounter")) || 0;
-  });
-  const [walkLabel, setWalkLabel] = useState('');
+  const initial = useMemo(() => loadInitialMultiPetState(), []);
+  const [petsById, setPetsById] = useState(() => initial.petsById);
+  const [petOrder, setPetOrder] = useState(() => initial.petOrder);
+  const [activePetId, setActivePetId] = useState(() => initial.activePetId);
+  const [migratedFromLegacy, setMigratedFromLegacy] = useState(() => initial.migrated);
 
-  const [bathProgressCounter, setBathProgressCounter] = useState(() => {
-    return Number(localStorage.getItem("bathProgressCounter")) || 0;
-  });
-  const [bathLabel, setBathLabel] = useState('');
-  const [feedProgressCounter, setFeedProgressCounter] = useState(() => {
-    return Number(localStorage.getItem("feedProgressCounter")) || 0;
-  });
-  const [feedLabel, setFeedLabel] = useState('');
+  const activeProfile = activePetId ? petsById?.[activePetId] : null;
+  const petInfo = activeProfile?.petInfo || normalizePetInfo(null);
+  const petType = petInfo?.basic?.type || "";
 
-  const [playProgressCounter, setPlayProgressCounter] = useState(() => {
-    return Number(localStorage.getItem("playProgressCounter")) || 0;
-  });
-  const [playLabel, setPlayLabel] = useState('');
+  const { recordActivity, clearHistory, lastCompleted, streak } = useActivityHistory(activePetId);
 
-  const [petInfo, setPetInfo] = useState(() => {
-    try {
-      const stored = localStorage.getItem("PetInfo");
-      if (stored) return JSON.parse(stored);
-    } catch (e) {
-      console.warn("PetInfo in localStorage is corrupted, resetting:", e);
-    }
-    return {
-      basic: { name: "", age: "", sex: "", breed: "", type: "" },
-      additional: { feed: {}, play: {}, walk: {}, bath: {} },
-      attributes: { hunger: 70, happiness: 80, energy: 60, hygiene: 90 },
-      penalizedFeed: {},
-      penalizedBath: {},
-      penalizedPlay: {},
-      penalizedWalk: {},
-    };
-  });
-
-  const emptyPetInfo = {
-    basic: { name: "", age: "", sex: "", breed: "", type: "" },
-    additional: { feed: {}, play: {}, walk: {}, bath: {} },
-    attributes: { hunger: 70, happiness: 80, energy: 60, hygiene: 90 },
-    penalizedFeed: {},
-    penalizedBath: {},
-    penalizedPlay: {},
-    penalizedWalk: {},
-  };
-
-  const { recordActivity, clearHistory, lastCompleted, streak } = useActivityHistory();
-
-  const resetPetInfo = () => {
-    localStorage.removeItem("PetInfo");
-    localStorage.removeItem("walkProgressCounter");
-    localStorage.removeItem("feedProgressCounter");
-    localStorage.removeItem("bathProgressCounter");
-    localStorage.removeItem("playProgressCounter");
-    localStorage.removeItem("penaltyResetDate");
-    sessionStorage.removeItem("schedulesReady");
-    setPetInfo(emptyPetInfo);
-    setWalkProgressCounter(0);
-    setFeedProgressCounter(0);
-    setBathProgressCounter(0);
-    setPlayProgressCounter(0);
-    setSchedulesReady(false);
-    clearHistory();
-  };
-
-  // Reset on new browser session
-  useEffect(() => {
-    const sessionAlive = sessionStorage.getItem("sessionAlive");
-    if (!sessionAlive) {
-      resetPetInfo();
-      sessionStorage.setItem("sessionAlive", "true");
-    }
+  const addPet = useCallback((type) => {
+    const profile = createProfile(type);
+    setPetsById((prev) => ({ ...(prev || {}), [profile.id]: profile }));
+    setPetOrder((prev) => [profile.id, ...((Array.isArray(prev) ? prev : []).filter((id) => id !== profile.id))]);
+    setActivePetId(profile.id);
+    return profile.id;
   }, []);
 
-  // Reset daily penalties and progress counters at the start of each new day
+  const deletePet = useCallback(
+    (petId) => {
+      setPetsById((prev) => {
+        const next = { ...(prev || {}) };
+        delete next[petId];
+        return next;
+      });
+      setPetOrder((prev) => (Array.isArray(prev) ? prev.filter((id) => id !== petId) : []));
+      setActivePetId((prevActive) => {
+        if (prevActive !== petId) return prevActive;
+        const remaining = (Array.isArray(petOrder) ? petOrder : []).filter((id) => id !== petId);
+        return remaining.length > 0 ? remaining[0] : null;
+      });
+      try {
+        localStorage.removeItem(`activityHistory:${petId}`);
+      } catch {
+        // ignore storage failures (private mode / full quota)
+      }
+    },
+    [petOrder]
+  );
+
+  const setPetInfo = useCallback(
+    (updater) => {
+      if (!activePetId) return;
+      const nowIso = new Date().toISOString();
+      setPetsById((prev) => {
+        const current = prev?.[activePetId];
+        if (!current) return prev;
+        const prevInfo = current.petInfo;
+        const nextInfo = typeof updater === "function" ? updater(prevInfo) : updater;
+        const normalized = normalizePetInfo(nextInfo);
+        return { ...(prev || {}), [activePetId]: { ...current, petInfo: normalized, updatedAt: nowIso } };
+      });
+    },
+    [activePetId]
+  );
+
+  // Daily reset: refresh each pet's `daily` bucket once per day.
   useEffect(() => {
     const today = new Date().toDateString();
-    const lastReset = localStorage.getItem("penaltyResetDate");
-    if (lastReset !== today) {
-      setPetInfo(prev => ({
-        ...prev,
-        penalizedFeed: {},
-        penalizedBath: {},
-        penalizedPlay: {},
-        penalizedWalk: {},
-      }));
-      setWalkProgressCounter(0);
-      setBathProgressCounter(0);
-      setFeedProgressCounter(0);
-      setPlayProgressCounter(0);
-      safeSetItem("penaltyResetDate", today, onStorageError);
-    }
-  }, []);
+    const lastReset = localStorage.getItem(LS_PENALTY_RESET_DATE);
+    if (lastReset === today) return;
 
-  // Persist schedulesReady across refreshes within the same session
-  useEffect(() => {
-    sessionStorage.setItem("schedulesReady", schedulesReady);
-  }, [schedulesReady]);
+    setPetsById((prev) => {
+      const next = { ...(prev || {}) };
+      for (const id of Object.keys(next)) {
+        const profile = next[id];
+        const info = normalizePetInfo(profile?.petInfo);
+        next[id] = {
+          ...profile,
+          updatedAt: new Date().toISOString(),
+          petInfo: { ...info, daily: emptyDaily(today) },
+        };
+      }
+      return next;
+    });
 
-  // Save counters whenever they change
-  useEffect(() => {
-    safeSetItem("feedProgressCounter", feedProgressCounter, onStorageError);
-  }, [feedProgressCounter, onStorageError]);
-
-  useEffect(() => {
-    safeSetItem("walkProgressCounter", walkProgressCounter, onStorageError);
-  }, [walkProgressCounter, onStorageError]);
-
-  useEffect(() => {
-    safeSetItem("bathProgressCounter", bathProgressCounter, onStorageError);
-  }, [bathProgressCounter, onStorageError]);
-
-  useEffect(() => {
-    safeSetItem("playProgressCounter", playProgressCounter, onStorageError);
-  }, [playProgressCounter, onStorageError]);
+    safeSetItem(LS_PENALTY_RESET_DATE, today, onStorageError);
+  }, [onStorageError]);
 
   const totalWalks = petInfo?.additional?.walk ? Object.values(petInfo.additional.walk).length : 0;
   const totalMeals = petInfo?.additional?.feed ? Object.values(petInfo.additional.feed).length : 0;
   const totalBaths = petInfo?.additional?.bath ? Object.values(petInfo.additional.bath).length : 0;
   const totalPlays = petInfo?.additional?.play ? Object.values(petInfo.additional.play).length : 0;
 
-  useEffect(()=>{
-    safeSetItem("PetInfo", JSON.stringify(petInfo), onStorageError);
-  }, [petInfo]);
+  const todayStr = new Date().toDateString();
+  const dailyToday = petInfo?.daily?.date === todayStr ? petInfo.daily : emptyDaily(todayStr);
 
-  usePetAttributes(setPetInfo, schedulesReady);
-  useNotifications(petInfo, schedulesReady, addToast);
+  const walkProgressCounter = Object.keys(dailyToday.completed.walk || {}).length;
+  const bathProgressCounter = Object.keys(dailyToday.completed.bath || {}).length;
+  const feedProgressCounter = Object.keys(dailyToday.completed.feed || {}).length;
+  const playProgressCounter = Object.keys(dailyToday.completed.play || {}).length;
+
+  const baseDate = new Date();
+  const walkSlots = getSlotsForToday("walk", petInfo?.additional?.walk, baseDate);
+  const bathSlots = getSlotsForToday("bath", petInfo?.additional?.bath, baseDate);
+  const feedSlots = getSlotsForToday("feed", petInfo?.additional?.feed, baseDate);
+  const playSlots = getSlotsForToday("play", petInfo?.additional?.play, baseDate);
+
+  const walkLabel =
+    walkSlots.length === 0
+      ? "No walks scheduled!"
+      : walkProgressCounter < walkSlots.length
+        ? `Next walk: ${walkSlots[walkProgressCounter].timeStr}`
+        : "All walks done!";
+  const bathLabel =
+    bathSlots.length === 0
+      ? "No baths scheduled!"
+      : bathProgressCounter < bathSlots.length
+        ? `Next bath: ${bathSlots[bathProgressCounter].timeStr}`
+        : "Shower done!";
+  const feedLabel =
+    feedSlots.length === 0
+      ? "No meals scheduled"
+      : feedProgressCounter < feedSlots.length
+        ? `Next meal: ${feedSlots[feedProgressCounter].timeStr}`
+        : "All meals done!";
+  const playLabel =
+    playSlots.length === 0
+      ? "No plays scheduled!"
+      : playProgressCounter < playSlots.length
+        ? `Next play: ${playSlots[playProgressCounter].timeStr}`
+        : "Playing done!";
+
+  const onboardingStatus = getOnboardingStatus(petInfo);
+  const isCareEnabled = onboardingStatus === "complete";
+
+  const completeActivity = useCallback(
+    (type) => {
+      if (!activePetId) return;
+      if (!petInfo?.basic?.name) return;
+      recordActivity(type);
+      const now = new Date();
+      setPetInfo((prev) => {
+        let next = simulateToNow(prev, now);
+        const daily = next.daily?.date === now.toDateString() ? next.daily : emptyDaily(now.toDateString());
+        const slot = pickSlotToComplete({ ...next, daily }, type, now);
+        if (!slot) return { ...next, daily };
+
+        const nextCompletedForType = { ...(daily.completed?.[type] || {}), [slot.slotId]: now.toISOString() };
+        const nextDaily = { ...daily, completed: { ...(daily.completed || {}), [type]: nextCompletedForType } };
+
+        const attrs = { ...(next.attributes || {}) };
+        if (type === "feed") {
+          attrs.hunger = clamp01_100((attrs.hunger ?? 0) - 20);
+          attrs.energy = clamp01_100((attrs.energy ?? 0) + 10);
+          attrs.happiness = clamp01_100((attrs.happiness ?? 0) + 5);
+          attrs.hygiene = clamp01_100((attrs.hygiene ?? 0) - 2);
+        }
+        if (type === "play") {
+          attrs.happiness = clamp01_100((attrs.happiness ?? 0) + 20);
+          attrs.energy = clamp01_100((attrs.energy ?? 0) - 15);
+          attrs.hunger = clamp01_100((attrs.hunger ?? 0) + 10);
+          attrs.hygiene = clamp01_100((attrs.hygiene ?? 0) - 3);
+        }
+        if (type === "walk") {
+          attrs.hunger = clamp01_100((attrs.hunger ?? 0) + 10);
+          attrs.energy = clamp01_100((attrs.energy ?? 0) - 10);
+          attrs.happiness = clamp01_100((attrs.happiness ?? 0) + 15);
+          attrs.hygiene = clamp01_100((attrs.hygiene ?? 0) - 5);
+        }
+        if (type === "bath") {
+          attrs.hygiene = clamp01_100((attrs.hygiene ?? 0) + 20);
+          attrs.energy = clamp01_100((attrs.energy ?? 0) - 5);
+          attrs.happiness = clamp01_100((attrs.happiness ?? 0) - 5);
+        }
+
+        return { ...next, attributes: attrs, daily: nextDaily };
+      });
+    },
+    [activePetId, petInfo?.basic?.name, recordActivity, setPetInfo]
+  );
+
+  // Persist multi-pet state.
+  useEffect(() => {
+    safeSetItem(LS_PETS_BY_ID, JSON.stringify(petsById || {}), onStorageError);
+    safeSetItem(LS_PET_ORDER, JSON.stringify(petOrder || []), onStorageError);
+    safeSetItem(LS_ACTIVE_PET_ID, activePetId || "", onStorageError);
+  }, [activePetId, onStorageError, petOrder, petsById]);
+
+  // Legacy cleanup (after migration is persisted at least once).
+  useEffect(() => {
+    if (!migratedFromLegacy) return;
+    try {
+      localStorage.removeItem("PetInfo");
+      localStorage.removeItem("SelectedPet");
+      sessionStorage.removeItem("schedulesReady");
+    } catch {
+      // ignore
+    }
+    setMigratedFromLegacy(false);
+  }, [migratedFromLegacy]);
+
+  usePetAttributes(setPetInfo, isCareEnabled);
+  useNotifications(petInfo, isCareEnabled, addToast);
 
   return (
     <>
-    <button
-      onClick={toggleDark}
-      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      className="fixed top-3 right-3 z-[100] bg-[#FFC832] w-[36px] h-[36px] flex items-center justify-center shadow-[2px_4px_0_#b91c1c] active:translate-y-1 active:shadow-[0_2px_0_#b91c1c]"
-    >
-      {isDark ? <Sun size={16} className="text-black" /> : <Moon size={16} className="text-black" />}
-    </button>
-    {toasts.length > 0 && (
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center">
-        {toasts.map(toast => (
-          toast.urgent
-            ? <div key={toast.id} className="bg-[#FF3232] border-2 border-[#FFC832] shadow-[4px_4px_0_#000] px-6 py-4 text-white text-[12px] font-bold whitespace-nowrap animate-pulse tracking-widest uppercase">
+      <button
+        onClick={toggleDark}
+        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+        className="fixed top-3 right-3 z-[100] bg-[#FFC832] w-[36px] h-[36px] flex items-center justify-center shadow-[2px_4px_0_#b91c1c] active:translate-y-1 active:shadow-[0_2px_0_#b91c1c]"
+      >
+        {isDark ? <Sun size={16} className="text-black" /> : <Moon size={16} className="text-black" />}
+      </button>
+
+      {toasts.length > 0 && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center">
+          {toasts.map((toast) =>
+            toast.urgent ? (
+              <div
+                key={toast.id}
+                className="bg-[#FF3232] border-2 border-[#FFC832] shadow-[4px_4px_0_#000] px-6 py-4 text-white text-[12px] font-bold whitespace-nowrap animate-pulse tracking-widest uppercase"
+              >
                 {toast.message}
               </div>
-            : <div key={toast.id} className="bg-[#1b1a1a] border-2 border-[#FFC832] shadow-[4px_4px_0_#FFC832] px-6 py-4 text-white text-[12px] font-bold whitespace-nowrap">
+            ) : (
+              <div
+                key={toast.id}
+                className="bg-[#1b1a1a] border-2 border-[#FFC832] shadow-[4px_4px_0_#FFC832] px-6 py-4 text-white text-[12px] font-bold whitespace-nowrap"
+              >
                 🐾 {toast.message}
               </div>
-        ))}
-      </div>
-    )}
-    {storageWarning && (
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-[#1b1a1a] text-white text-[11px] px-4 py-2 z-50 shadow-lg">
-        ⚠ Could not save data — storage may be full.{' '}
-        <button onClick={() => setStorageWarning(false)} className="underline ml-2 bg-transparent border-none text-white cursor-pointer text-[11px]">dismiss</button>
-      </div>
-    )}
-    <PetContext.Provider value={{
-      pet,
-      setPet,
-      petInfo,
-      setPetInfo,
-      walkProgressCounter,
-      setWalkProgressCounter,
-      walkLabel,
-      setWalkLabel,
-      totalWalks,
-      bathProgressCounter,
-      setBathProgressCounter,
-      bathLabel,
-      setBathLabel,
-      totalBaths,
-      feedProgressCounter,
-      setFeedProgressCounter,
-      feedLabel,
-      setFeedLabel,
-      totalMeals,
-      playProgressCounter,
-      setPlayProgressCounter,
-      playLabel,
-      setPlayLabel,
-      totalPlays,
-      schedulesReady,
-      setSchedulesReady,
-      resetPetInfo,
-      recordActivity,
-      lastCompleted,
-      streak,
-      addToast,
-    }}>
-      {children}
-    </PetContext.Provider>
+            )
+          )}
+        </div>
+      )}
+
+      {storageWarning && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-[#1b1a1a] text-white text-[11px] px-4 py-2 z-50 shadow-lg">
+          ⚠ Could not save data — storage may be full.{" "}
+          <button
+            onClick={() => setStorageWarning(false)}
+            className="underline ml-2 bg-transparent border-none text-white cursor-pointer text-[11px]"
+          >
+            dismiss
+          </button>
+        </div>
+      )}
+
+      <PetContext.Provider
+        value={{
+          petsById,
+          petOrder,
+          activePetId,
+          setActivePetId,
+          addPet,
+          deletePet,
+
+          petInfo,
+          setPetInfo,
+          petType,
+
+          walkProgressCounter,
+          walkLabel,
+          totalWalks,
+          bathProgressCounter,
+          bathLabel,
+          totalBaths,
+          feedProgressCounter,
+          feedLabel,
+          totalMeals,
+          playProgressCounter,
+          playLabel,
+          totalPlays,
+
+          completeActivity,
+          recordActivity,
+          clearHistory,
+          lastCompleted,
+          streak,
+          addToast,
+        }}
+      >
+        {children}
+      </PetContext.Provider>
     </>
   );
 };
