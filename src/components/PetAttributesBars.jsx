@@ -34,8 +34,8 @@ const PetAttributeBars = () => {
   const heading = petType === 'cat' ? 'Level Up Your Cat!' : 'Level Up Your Pup!';
 
   return (
-    <div className='bg-[#1b1a1a] min-h-screen w-screen m-0 p-0 flex justify-center items-center'>
-      <div className='relative bg-[#eaddc3] dark:bg-[#2a2520] w-[90vw] max-w-[50rem] min-h-[80vh] my-4 flex flex-col items-center p-[10px] rounded-lg shadow-lg'>
+    <div className='bg-[#1b1a1a] h-screen w-screen m-0 p-0 flex justify-center items-center overflow-hidden'>
+      <div className='relative bg-[#eaddc3] dark:bg-[#2a2520] w-[90vw] max-w-[50rem] h-[80vh] flex flex-col items-center p-[10px] rounded-lg shadow-lg overflow-hidden'>
         <ThemeToggle />
         <button
           onClick={() => navigate('/pet-care-zone')}
